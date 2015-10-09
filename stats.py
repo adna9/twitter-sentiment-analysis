@@ -57,7 +57,8 @@ def plotLengthDistribution(l,t):
 #def main():
     
 #read labels and messages from dataset
-dataset = "datasets/tweets#2015.tsv"
+#dataset = "datasets/tweets#2015.tsv"
+dataset = "datasets/twitter-dev-gold-B.tsv"
 labels, messages = tsvreader.opentsv(dataset)
 neutral_messages = subList(messages,labels,"neutral")
 positive_messages = subList(messages,labels,"positive")
@@ -147,6 +148,7 @@ total_neutral = len([s for s in labels if s=="neutral"])
 total_positive = len([s for s in labels if s=="positive"])
 total_negative = len([s for s in labels if s=="negative"])
 
+
 #plot number of messages
 slices = [total_neutral,total_positive,total_negative]
 fig = plt.figure(figsize=[10,10])
@@ -154,16 +156,16 @@ ax = fig.add_subplot(111)
 cmap = plt.cm.prism
 pie_labels = ["neutral :"+str(total_neutral),"positive : "+str(total_positive),"negative : "+str(total_negative)]
 ax.pie(slices,labels=pie_labels,labeldistance=1.05)
-ax.set_title("Total number of messages : "+str(total))
+ax.set_title("Training set 13 \nTotal number of messages : "+str(total))
 plt.show()
 
 #plot length of messages
-pylab.xlabel("Category")
-pylab.ylabel("Average length")
-pylab.title("Average length of messages")
-plt.bar(range(4),[average_length_all,average_length_neutral,average_length_positive,average_length_negative],align="center")
-plt.xticks(range(4),["All ("+str(average_length_all)+")","Neutral ("+str(average_length_neutral)+")","Positive ("+str(average_length_positive)+")","Negative ("+str(average_length_negative)+")"])
-plt.show()
+##pylab.xlabel("Category")
+##pylab.ylabel("Average length")
+##pylab.title("Average length of messages")
+##plt.bar(range(4),[average_length_all,average_length_neutral,average_length_positive,average_length_negative],align="center")
+##plt.xticks(range(4),["All ("+str(average_length_all)+")","Neutral ("+str(average_length_neutral)+")","Positive ("+str(average_length_positive)+")","Negative ("+str(average_length_negative)+")"])
+##plt.show()
 
 #frequency plot
 #freq_all.plot(20,cumulative=True)
@@ -172,54 +174,54 @@ plt.show()
 #freq_negative.plot(20,cumulative=True)
 
 #commmon words for subjective and objective messages
-text_objective = text_neutral
-text_subjective = list(text_positive) + list(text_negative)
-freq_objective = FreqDist(text_objective)
-freq_subjective = FreqDist(text_subjective)
-
-common_words_objective = freq_objective.most_common(number_of_most_common)
-common_words_subjective = freq_subjective.most_common(number_of_most_common)
-
-objective_labels = [x[0] for x in common_words_objective]
-subjective_labels = [x[0] for x in common_words_subjective]
-
-labels = list(set(objective_labels+subjective_labels))
-
-objective_keys = [freq_objective.get(x) for x in labels]
-subjective_keys = [freq_subjective.get(x) for x in labels]
-
-for i in range(0,len(labels)):
-    if objective_keys[i]==None:
-        objective_keys[i]=0
-
-    if subjective_keys[i]==None:
-        subjective_keys[i]=0
-
-X=np.arange(len(labels))
-#plt.bar(X+0.00,objective_keys,color="c",width=0.35,label="Objective messages")
-#plt.bar(X+0.25,subjective_keys,color="r",width=0.35,label="Subjective messages")
-plt.bar(X+0.00,[x/float(total_neutral)*100 for x in objective_keys],color="c",width=0.35,label="Objective messages")
-plt.bar(X+0.25,[x/float(total_negative+total_positive)*100 for x in subjective_keys],color="r",width=0.35,label="Subjective messages")
-#plt.xticks([x+0.25 for x in range(len(labels))],labels)
-plt.xticks([x+0.25 for x in range(len(labels))],([x for x in labels]),size=15)
-plt.ylabel("%")
-plt.legend(loc="upper right")
-plt.title("Most common words(stopwords removed)")
-
-plt.show()
+##text_objective = text_neutral
+##text_subjective = list(text_positive) + list(text_negative)
+##freq_objective = FreqDist(text_objective)
+##freq_subjective = FreqDist(text_subjective)
+##
+##common_words_objective = freq_objective.most_common(number_of_most_common)
+##common_words_subjective = freq_subjective.most_common(number_of_most_common)
+##
+##objective_labels = [x[0] for x in common_words_objective]
+##subjective_labels = [x[0] for x in common_words_subjective]
+##
+##labels = list(set(objective_labels+subjective_labels))
+##
+##objective_keys = [freq_objective.get(x) for x in labels]
+##subjective_keys = [freq_subjective.get(x) for x in labels]
+##
+##for i in range(0,len(labels)):
+##    if objective_keys[i]==None:
+##        objective_keys[i]=0
+##
+##    if subjective_keys[i]==None:
+##        subjective_keys[i]=0
+##
+##X=np.arange(len(labels))
+###plt.bar(X+0.00,objective_keys,color="c",width=0.35,label="Objective messages")
+###plt.bar(X+0.25,subjective_keys,color="r",width=0.35,label="Subjective messages")
+##plt.bar(X+0.00,[x/float(total_neutral)*100 for x in objective_keys],color="c",width=0.35,label="Objective messages")
+##plt.bar(X+0.25,[x/float(total_negative+total_positive)*100 for x in subjective_keys],color="r",width=0.35,label="Subjective messages")
+###plt.xticks([x+0.25 for x in range(len(labels))],labels)
+##plt.xticks([x+0.25 for x in range(len(labels))],([x for x in labels]),size=15)
+##plt.ylabel("%")
+##plt.legend(loc="upper right")
+##plt.title("Most common words(stopwords removed)")
+##
+##plt.show()
 
 #distribution of length of messages
-len_all = [len(x) for x in messages]
-len_neutral = [len(x) for x in neutral_messages]
-len_positive = [len(x) for x in positive_messages]
-len_negative = [len(x) for x in negative_messages]
-len_subjective = len_positive + len_negative
-
-plotLengthDistribution(len_all,"All messages")
-plotLengthDistribution(len_neutral,"Objective messages")
-plotLengthDistribution(len_positive,"Positive messages")
-plotLengthDistribution(len_negative,"Negative messages")
-plotLengthDistribution(len_subjective,"Subjective messages")
+##len_all = [len(x) for x in messages]
+##len_neutral = [len(x) for x in neutral_messages]
+##len_positive = [len(x) for x in positive_messages]
+##len_negative = [len(x) for x in negative_messages]
+##len_subjective = len_positive + len_negative
+##
+##plotLengthDistribution(len_all,"All messages")
+##plotLengthDistribution(len_neutral,"Objective messages")
+##plotLengthDistribution(len_positive,"Positive messages")
+##plotLengthDistribution(len_negative,"Negative messages")
+##plotLengthDistribution(len_subjective,"Subjective messages")
 
     
 #if __name__ == "__main__":
