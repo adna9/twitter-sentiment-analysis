@@ -4,8 +4,9 @@ from tokenizers import twokenize
 from postaggers import arktagger
 from lexicons import Slang
 from evaluation import measures
-from classifiers import LogisticRegression,SVM
+from classifiers import LogisticRegression, SVM, MajorityClassifier
 import matplotlib.pyplot as plt
+import numpy as np
 
 def tokenize(l):
     tokens=[]
@@ -15,31 +16,66 @@ def tokenize(l):
 
     return tokens
 
-def plot_learning_curve(train_error,test_error):
-    x = [0,10,20,30,40,50,60,70,80,90,100]
+def plot_learning_curve(length,features_train,labels_train,features_test,labels_test):
+    #run for every 10% of training set and compute training error and testing error
+    step = length/10
+    train_error = []
+    test_error = []
+    maj_clas_train_error = []
+    maj_clas_test_error = []
+
+    for i in range(0,10):
+        #train for (i+1)*10 percent of training set
+        f = features_train[0:((i+1)*(step))]
+        l=labels_train[0:((i+1)*(step))]
+
+        #train classifier for the specific subset of training set
+        model = LogisticRegression.train(f,l)
+
+        #get training error
+        prediction = LogisticRegression.predict(f,model)
+        train_error.append(measures.error(l,prediction))
+
+        #get testing error
+        prediction = LogisticRegression.predict(features_test,model)
+        test_error.append(measures.error(labels_test,prediction))
+
+        #get testing error for majority classifier
+        prediction = MajorityClassifier.predict(features_test)
+        maj_clas_test_error.append(measures.error(labels_test,prediction))
+
+        #get training error for majority classifier
+        prediction = MajorityClassifier.predict(f)
+        maj_clas_train_error.append(measures.error(l,prediction))
+
+
+    #insert bias
+    train_error.insert(0,0)
+    test_error.insert(0,1)
+    maj_clas_test_error.insert(0,maj_clas_test_error[0])
+    maj_clas_train_error.insert(0,1)
+    
+    x = np.arange(len(train_error))*10
     plt.plot(x,train_error,label="Training Error")
     plt.plot(x,test_error,label="Testing Error")
+    plt.plot(x,maj_clas_test_error,label="Majority Classifier - Testing Error")
+    plt.plot(x,maj_clas_train_error,label="Majority Classifier - Training Error")
     plt.ylabel('error')
     plt.xlabel("% of messages")
+    plt.title("Error")
     plt.legend()
     plt.show()
 
 #def main():
 
 #load training set
-#dataset_train = "datasets/training-set-sample.tsv"
-dataset_train = "datasets/train15.tsv"
+dataset_train = "datasets/training-set-sample.tsv"
+#dataset_train = "datasets/train15.tsv"
 labels_train, messages_train = tsvreader.opentsv(dataset_train)
-##labels,messages  = tsvreader.opentsv(dataset_train)
-##labels_train = labels[0:7000]
-##messages_train = messages[0:7000]
-##
-##labels_test = labels[7000:len(labels)]
-##messages_test = messages[7000:len(messages)]
 
 #load testing set
-dataset_test = "datasets/dev15.tsv"
-#dataset_test = "datasets/testing-set-sample.tsv"
+#dataset_test = "datasets/dev15.tsv"
+dataset_test = "datasets/testing-set-sample.tsv"
 labels_test, messages_test = tsvreader.opentsv(dataset_test)
 
 #load Slang Dictionary
@@ -66,44 +102,28 @@ features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train
 #get features from test messages 
 features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary)
 
-#train classifier and return trained model
-#model = LogisticRegression.train(features_train,labels_train)
-#model = SVM.train(features_train,labels_train)
-
-#predict labels
-#prediction = LogisticRegression.predict(features_test,model)
-#prediction = SVM.predict(features_test,model)
-
-#calculate accuracy
-#print "Average F1 : " +str(measures.avgF1(labels_test,prediction))
-
-#run for every 10% of training set and compute training error and testing error
-step = len(messages_train)/10
-train_error = []
-test_error = []
-
-for i in range(0,len(messages_train),step):
-    if i+step<len(messages_train):
-        f = features_train[0:(i+step)]
-        l=labels_train[0:(i+step)]
-    else:
-        f = features_train[0:len(messages_train)]
-        l=labels_train[0:len(messages_train)]
+###train classifier and return trained model
+##model = LogisticRegression.train(features_train,labels_train)
+###model = SVM.train(features_train,labels_train)
+##
+###predict labels
+##prediction = LogisticRegression.predict(features_test,model)
+###prediction = SVM.predict(features_test,model)
+##
+###calculate accuracy
+##print "Average F1 : " +str(measures.avgF1(labels_test,prediction))
+##print "Accuracy : " +str(measures.accuracy(labels_test,prediction))
+##print "F1 Objective : " +str(measures.F1(labels_test,prediction,0))
+##print "F1 Subjective : " +str(measures.F1(labels_test,prediction,1))
+##print "Precision Objective: " +str(measures.precision(labels_test,prediction,0))
+##print "Precision Subjective: " +str(measures.precision(labels_test,prediction,1))
+##print "Recall Objective : " +str(measures.recall(labels_test,prediction,0))
+##print "Recall Subjective : " +str(measures.recall(labels_test,prediction,1))
 
 
-    #train classifier for the specific subset of training set
-    model = LogisticRegression.train(f,l)
-
-
-    #get training error
-    prediction = LogisticRegression.predict(f,model)
-    train_error.append(measures.error(l,prediction))
-
-    #get testing error
-    prediction = LogisticRegression.predict(features_test,model)
-    test_error.append(measures.error(labels_test,prediction))
 
 #plot learning curve
+plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
 
 ##if __name__ == "__main__":
 ##    main() 
