@@ -85,7 +85,7 @@ def plotDistribution(l,a,b,c=0,t="No title"):
     plt.show()
     
 #read labels and messages from dataset
-dataset = "datasets/tweets#2013.tsv"
+dataset = "datasets/train15.tsv"
 #dataset = "datasets/training-set-sample.tsv"
 labels, messages = tsvreader.opentsv(dataset)
 
@@ -194,13 +194,13 @@ subjective = labels.index("subjective")
 ##plotHistogram(mpqa_scores,neutral,subjective,t="MPQA Lexicon")
 ##plotHistogram(swn_scores,neutral,subjective,t="SentiWordNet Lexicon")
 
-plotDistribution(socal_scores,neutral,subjective,t="Socal Lexicon")
-plotDistribution(minqinghu_scores,neutral,subjective,t="Minqing Hu Lexicon")
-plotDistribution(afinn_scores,neutral,subjective,t="Afinn Lexicon")
-plotDistribution(nrc1_scores,neutral,subjective,t="NRC v1 Lexicon")
-plotDistribution(nrc2_scores,neutral,subjective,t="NRC v2 Lexicon")
-plotDistribution(nrc3_scores,neutral,subjective,t="NRC v3 Lexicon")
-plotDistribution(nrc4_scores,neutral,subjective,t="NRC v4 Lexicon")
-plotDistribution(nrc5_scores,neutral,subjective,t="NRC v5 Lexicon")
-plotDistribution(mpqa_scores,neutral,subjective,t="MPQA Lexicon")
-plotDistribution(swn_scores,neutral,subjective,t="SentiWordNet Lexicon")
+##plotDistribution(socal_scores,neutral,subjective,t="Socal Lexicon")
+##plotDistribution(minqinghu_scores,neutral,subjective,t="Minqing Hu Lexicon")
+##plotDistribution(afinn_scores,neutral,subjective,t="Afinn Lexicon")
+##plotDistribution(nrc1_scores,neutral,subjective,t="NRC v1 Lexicon")
+##plotDistribution(nrc2_scores,neutral,subjective,t="NRC v2 Lexicon")
+##plotDistribution(nrc3_scores,neutral,subjective,t="NRC v3 Lexicon")
+##plotDistribution(nrc4_scores,neutral,subjective,t="NRC v4 Lexicon")
+##plotDistribution(nrc5_scores,neutral,subjective,t="NRC v5 Lexicon")
+##plotDistribution(mpqa_scores,neutral,subjective,t="MPQA Lexicon")
+##plotDistribution(swn_scores,neutral,subjective,t="SentiWordNet Lexicon")

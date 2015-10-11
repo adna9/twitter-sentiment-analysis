@@ -38,8 +38,3 @@ def numberOfUrls(pos,tokens):
 def numberOfSubjectiveEmoticons(pos,tokens):
     return (len([x for x in pos if x=="E"]) + len([x for x in tokens if (x=="EMOTICON_SAD" or x=="EMOTICON_HAPPY")]))
 
-
-
-
-
-

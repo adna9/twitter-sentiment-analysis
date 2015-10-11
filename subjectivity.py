@@ -7,6 +7,10 @@ from evaluation import measures
 from classifiers import LogisticRegression, SVM, MajorityClassifier
 import matplotlib.pyplot as plt
 import numpy as np
+from nltk import bigrams
+from lexicons import SocalLexicon,MinqingHuLexicon,afinn,NRCLexicon,MPQALexicon,SentiWordNetLexicon
+from lexicons.afinn import Afinn
+import time
 
 def tokenize(l):
     tokens=[]
@@ -16,7 +20,7 @@ def tokenize(l):
 
     return tokens
 
-def plot_learning_curve(length,features_train,labels_train,features_test,labels_test):
+def plot_learning_curve(length,features_train,labels_train,features_test,labels_test,title):
     #run for every 10% of training set and compute training error and testing error
     step = length/10
     train_error = []
@@ -62,11 +66,21 @@ def plot_learning_curve(length,features_train,labels_train,features_test,labels_
     plt.plot(x,maj_clas_train_error,label="Majority Classifier - Training Error")
     plt.ylabel('error')
     plt.xlabel("% of messages")
-    plt.title("Error")
+    plt.title(title)
     plt.legend()
     plt.show()
 
+#calculate bigrams of every item of the list l
+def getBigrams(l):
+    b = []
+    for x in l:
+        b.append(list(bigrams(x)))
+
+    return b
+
 #def main():
+
+start_time = time.time()
 
 #load training set
 dataset_train = "datasets/training-set-sample.tsv"
@@ -96,34 +110,63 @@ tokens_test = tokenize(messages_test)
 pos_tags_train = arktagger.pos_tag_list(messages_train)
 pos_tags_test = arktagger.pos_tag_list(messages_test)
 
+#compute pos tag bigrams for all messages
+pos_bigrams_train = getBigrams(pos_tags_train)
+pos_bigrams_test = getBigrams(pos_tags_test)
+
+#compoute pos tag bigrams Scores
+#TODO
+
+#Load Lexicons
+
+#Socal Lexicon
+socal = SocalLexicon.SocalLexicon()
+#Minqing Hu Lexicon
+minqinghu = MinqingHuLexicon.MinqingHuLexicon()
+#Afinn Lexicon
+afinn = Afinn()
+#NRC Lexicon - 5 different versions
+nrc1 = NRCLexicon.NRCLexicon(0)
+nrc2 = NRCLexicon.NRCLexicon(1)
+nrc3 = NRCLexicon.NRCLexicon(2)
+nrc4 = NRCLexicon.NRCLexicon(3)
+nrc5 = NRCLexicon.NRCLexicon(4)
+#MPQA Lexicon
+mpqa = MPQALexicon.MPQALexicon()
+#SentiWordNet Lexicon
+swn = SentiWordNetLexicon.SentiWordNetLexicon()
+
+lexicons = [socal,minqinghu,afinn,nrc1,nrc2,nrc3,nrc4,nrc5,mpqa,swn]
+
 #get features from train messages
-features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary)
+features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons)
 
 #get features from test messages 
-features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary)
+features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons)
 
-###train classifier and return trained model
-##model = LogisticRegression.train(features_train,labels_train)
-###model = SVM.train(features_train,labels_train)
-##
-###predict labels
-##prediction = LogisticRegression.predict(features_test,model)
-###prediction = SVM.predict(features_test,model)
-##
-###calculate accuracy
-##print "Average F1 : " +str(measures.avgF1(labels_test,prediction))
-##print "Accuracy : " +str(measures.accuracy(labels_test,prediction))
-##print "F1 Objective : " +str(measures.F1(labels_test,prediction,0))
-##print "F1 Subjective : " +str(measures.F1(labels_test,prediction,1))
-##print "Precision Objective: " +str(measures.precision(labels_test,prediction,0))
-##print "Precision Subjective: " +str(measures.precision(labels_test,prediction,1))
-##print "Recall Objective : " +str(measures.recall(labels_test,prediction,0))
-##print "Recall Subjective : " +str(measures.recall(labels_test,prediction,1))
+#train classifier and return trained model
+model = LogisticRegression.train(features_train,labels_train)
+#model = SVM.train(features_train,labels_train)
 
+#predict labels
+prediction = LogisticRegression.predict(features_test,model)
+#prediction = SVM.predict(features_test,model)
+
+#calculate accuracy
+print "Average F1 : " +str(measures.avgF1(labels_test,prediction))
+print "Accuracy : " +str(measures.accuracy(labels_test,prediction))
+print "F1 Objective : " +str(measures.F1(labels_test,prediction,0))
+print "F1 Subjective : " +str(measures.F1(labels_test,prediction,1))
+print "Precision Objective: " +str(measures.precision(labels_test,prediction,0))
+print "Precision Subjective: " +str(measures.precision(labels_test,prediction,1))
+print "Recall Objective : " +str(measures.recall(labels_test,prediction,0))
+print "Recall Subjective : " +str(measures.recall(labels_test,prediction,1))
 
 
 #plot learning curve
-plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
+#plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test,"Error")
+
+print("--- %s seconds ---" % (time.time() - start_time))
 
 ##if __name__ == "__main__":
 ##    main() 
