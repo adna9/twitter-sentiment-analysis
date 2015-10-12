@@ -1,44 +1,45 @@
-def accuracy(A,B):
+def accuracy(label,prediction):
     #if A[i]==B[i] then A[i]+B[i]==0 or A[i]+B[i]==2
     #else if A[i]/=B[i] the A[i]+B[i]=1
-    errors = sum((A+B)==1)
+    errors = sum((label+prediction)==1)
 
-    return (len(A)-errors)/float(len(A))
+    return (len(label)-errors)/float(len(label))
 
-def error(A,B):
-    return 1-accuracy(A,B)
+def error(label,prediction):
+    return 1-accuracy(label,prediction)
 
-def avgF1(A,B):
-    return (F1(A,B,0) + F1(A,B,1))/2
+def avgF1(label,prediction):
+    return (F1(label,prediction,0) + F1(label,prediction,1))/2
 
-def F1(A,B,category):
-    pr = precision(A,B,category)
-    r = recall(A,B,category)
+def F1(label,prediction,category):
+    pr = precision(label,prediction,category)
+    r = recall(label,prediction,category)
 
     return (2*pr*r)/float(pr+r)
 
-def precision(A,B,category):
+def precision(label,prediction,category):
     #the number of messages that belong in C and were classified as C
-    x = 0
-    for i in range(0,len(A)):
-        if category==A[i] and A[i]==B[i]:
-            x+=1
+    truePositives = 0
+    
+    for i in range(0,len(label)):
+        if category==label[i] and label[i]==prediction[i]:
+            truePositives+=1
 
     #the number of messages that were classified as C
-    y = len([c for c in B if c==category])
+    y = len([c for c in prediction if c==category])
 
-    return x/float(y)
+    return truePositives/float(y)
 
-def recall(A,B,category):
+def recall(label,prediction,category):
+    
     #the number of messages that belong in C and were classified as C
-    x = 0
-    for i in range(0,len(A)):
-        if category==A[i] and A[i]==B[i]:
-            x+=1
+    truePositives = 0
+    for i in range(0,len(label)):
+        if category==label[i] and label[i]==prediction[i]:
+            truePositives+=1
 
     #the number of messages that beling in C
-    y = len([c for c in A if c==category])
+    y = len([c for c in label if c==category])
 
-    return x/float(y)
-
+    return truePositives/float(y)
 

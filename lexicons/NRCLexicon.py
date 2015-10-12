@@ -154,3 +154,13 @@ class NRCLexicon():
                 total += self.d_bigrams.get(bigram,0.0)
             
         return total
+
+    #compute the number of tokens(words) that appear in the lexicon
+    def getNumberOfAppearances(self,tokens):
+        total = 0
+
+        for token in tokens:
+            if self.d_unigrams.has_key(token):
+                total+=1
+
+        return total

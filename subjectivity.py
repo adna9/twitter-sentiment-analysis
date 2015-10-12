@@ -45,11 +45,11 @@ def plot_learning_curve(length,features_train,labels_train,features_test,labels_
         test_error.append(measures.error(labels_test,prediction))
 
         #get testing error for majority classifier
-        prediction = MajorityClassifier.predict(features_test)
+        prediction = MajorityClassifier.predictSubj(features_test)
         maj_clas_test_error.append(measures.error(labels_test,prediction))
 
         #get training error for majority classifier
-        prediction = MajorityClassifier.predict(f)
+        prediction = MajorityClassifier.predictSubj(f)
         maj_clas_train_error.append(measures.error(l,prediction))
 
 

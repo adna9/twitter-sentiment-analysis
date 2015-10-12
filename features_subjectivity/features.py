@@ -135,7 +135,7 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons):
 
     # Lexicon Based Features
 
-    #iterate for every lexivcon
+    #iterate for every lexicon
     for lexicon in lexicons:
         #score of lexicon (total score of all words)
         x = sumOfScores(lexicon,message,tokens,pos)
@@ -152,10 +152,19 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons):
         x = minOfScores(lexicon,tokens,pos)
         f.append(x)
 
+        #the count of words of the message that appear in the lexicon
+        x = numberOfAppearances(lexicon,tokens)
+        f.append(x)
 
-    
+        #the score of the last word of the message
+        x = scoreOfLastWord(lexicon,tokens[len(tokens)-1],pos[len(pos)-1])
+        f.append(x)
 
-    
+        #the score of the last word of the message that appears in the lexicon
+        x = scoreOfLastWordAppearedInLexicon(lexicon,tokens,pos)
+        f.append(x)
+
+        
 
 
 

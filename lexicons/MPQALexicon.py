@@ -13,7 +13,7 @@ class MPQALexicon():
 
         #word - sentiment dictionary
         self.d = {}
-        #word - stemmed dictionary (check if thw word is stemmed)
+        #word - stemmed dictionary (check if the word is stemmed)
         #self.s = {}
 
         self.loadLexicon()
@@ -56,5 +56,14 @@ class MPQALexicon():
                 #i.e if word = abuse we search for abuses,abused,abusing
             #elif:
             total += self.d.get(token,0.0)
+
+        return total
+
+    #compute the number of tokens(words) that appear in the lexicon
+    def getNumberOfAppearances(self,tokens):
+        total = 0
+        for token in tokens:
+            if self.d.has_key(token):
+                total+=1
 
         return total

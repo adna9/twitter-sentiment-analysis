@@ -1,6 +1,5 @@
 from nltk.corpus import sentiwordnet as s
 
-
 #class representing SentiWordNet Lexicon
 class SentiWordNetLexicon():
 
@@ -58,4 +57,14 @@ class SentiWordNetLexicon():
                 else:
                     return +1.0                
             else:
-                return 0.0                
+                return 0.0
+
+
+    #compute the number of tokens(words) that appear in the lexicon
+    def getNumberOfAppearances(self,tokens):
+        total = 0
+        for token in tokens:
+            if len(s.senti_synsets(token)) > 0:
+                total += 1
+
+        return total
