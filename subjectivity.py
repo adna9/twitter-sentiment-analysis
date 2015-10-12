@@ -78,6 +78,66 @@ def getBigrams(l):
 
     return b
 
+def getBigramsSet(pos_bigrams):
+    s = set()
+    
+    for x in pos_bigrams:
+        for bigram in x:
+            s.add(bigram)
+
+
+    return list(s)
+
+def posBigramsScore(bigrams,category,pos_tags_bigrams,labels):
+    #keep pos tags bigrams of specific category
+    bigrams_category = subList(pos_tags_bigrams,labels,category)
+
+    #initialize dictionary
+    d = {}
+
+    #calculate score for every bigram
+    for bigram in bigrams:
+        d[bigram] = score(bigram,category,bigrams_category,pos_tags_bigrams)
+
+
+    return d
+
+
+def score(bigram,category,bigrams_category,pos_tags_bigrams):
+    #messages of "category" containing "bigram"
+    x1 = 0
+    for i in range(0,len(bigrams_category)):
+        if bigram in bigrams_category[i]:
+            x1+=1
+
+    #messages containing "bigram"
+    x2 = 0
+    for i in range(0,len(pos_tags_bigrams)):
+        if bigram in pos_tags_bigrams[i]:
+            x2 += 1
+
+    #messages of "category"
+    x3 = len(bigrams_category)
+
+    precision = x1/float(x2)
+    recall = x1/float(x3)
+    
+
+    #return f1 score
+    if precision==0 or recall==0:
+        return 0
+    
+    return (2*precision*recall)/float(precision + recall)
+    
+def subList(pos_tags,labels,c):
+    sub=[]
+    for i in range(0,len(pos_tags)):
+        if labels[i]==c:
+            sub.append(pos_tags[i])
+
+    return sub
+
+
 #def main():
 
 start_time = time.time()
@@ -114,8 +174,12 @@ pos_tags_test = arktagger.pos_tag_list(messages_test)
 pos_bigrams_train = getBigrams(pos_tags_train)
 pos_bigrams_test = getBigrams(pos_tags_test)
 
-#compoute pos tag bigrams Scores
-#TODO
+#get the unique pos bigrams from training set
+unique_bigrams = getBigramsSet(pos_bigrams_train)
+#calculate pos bigrams score for all categories
+#both dictionaries will be used for training and testing (cannot create new for testing because we don't know the labels of the new messages)
+pos_bigrams_scores_objective = posBigramsScore(unique_bigrams,0,pos_bigrams_train,labels_train)
+pos_bigrams_scores_subjective = posBigramsScore(unique_bigrams,1,pos_bigrams_train,labels_train)
 
 #Load Lexicons
 
@@ -139,10 +203,10 @@ swn = SentiWordNetLexicon.SentiWordNetLexicon()
 lexicons = [socal,minqinghu,afinn,nrc1,nrc2,nrc3,nrc4,nrc5,mpqa,swn]
 
 #get features from train messages
-features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons)
+features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective)
 
 #get features from test messages 
-features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons)
+features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective)
 
 #train classifier and return trained model
 model = LogisticRegression.train(features_train,labels_train)

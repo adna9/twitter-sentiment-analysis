@@ -2,9 +2,10 @@ import numpy as np
 from morphologicalFeatures import *
 from posBasedFeatures import *
 from lexiconBasedFeatures import *
+from posBigramsFeatures import *
 
 #return feautures of a list of messages as an array
-def getFeatures(messages,tokens,pos,slangDictionary,lexicons):
+def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective):
     #initialize empty list with features for all message
     features = []
 
@@ -12,7 +13,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons):
     for i in range(0,len(messages)):
         
         #list with features for one message
-        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons)
+        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective)
 
         #add f to features
         features.append(f)
@@ -26,9 +27,8 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons):
     return features_array
 
 #calculate features for a message
-def calculateFeatures(message,tokens,pos,slangDictionary,lexicons):
+def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective):
     f=[]
-
     #Morphological Features
     
     #existance of enlogated tokens in message e.g. "baaad"
@@ -132,6 +132,21 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons):
     #the number of subjective emoticons
     x = numberOfSubjectiveEmoticons(pos,tokens)
     f.append(x)
+
+    #Pos Bigrams Features
+    
+    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
+    average, maximum, minimum = F1PosBigramsScore(pos_bigrams,pos_bigrams_scores_objective)
+    f.append(average)
+    f.append(maximum)
+    f.append(minimum)
+
+    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
+    average, maximum, minimum = F1PosBigramsScore(pos_bigrams,pos_bigrams_scores_subjective)
+    f.append(average)
+    f.append(maximum)
+    f.append(minimum)
+    
 
     # Lexicon Based Features
 
