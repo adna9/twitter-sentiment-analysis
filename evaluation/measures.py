@@ -28,6 +28,9 @@ def precision(label,prediction,category):
     #the number of messages that were classified as C
     y = len([c for c in prediction if c==category])
 
+    if(y==0) :
+        return -1
+
     return truePositives/float(y)
 
 def recall(label,prediction,category):
@@ -41,5 +44,8 @@ def recall(label,prediction,category):
     #the number of messages that beling in C
     y = len([c for c in label if c==category])
 
+    if(y==0) :
+        return -1
+    
     return truePositives/float(y)
 
