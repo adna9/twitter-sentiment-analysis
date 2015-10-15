@@ -7,8 +7,9 @@ from nltk import trigrams
 from lexicons import Slang
 from lexicons import SocalLexicon 
 from evaluation import measures
-from classifiers import LogisticRegression, SVM, MajorityClassifier
+from classifiers import LogisticRegression, SVM, MajorityClassifier,KNN
 import learningCurves
+
 
 
 def tokenize(l):
@@ -65,15 +66,18 @@ features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,big
 
 #train classifier and return trained model
 model = LogisticRegression.train(features_train,labels_train)
-#model = SVM.train(features_train,labels_train)
+#model = SVM.train(features_train,labels_train)           
+#model = KNN.train(features_train,labels_train)
 
 #predict labels
-prediction = LogisticRegression.predict(features_test,model)
-
+#prediction=SVM.predict(features_test,model)
+#prediction = KNN.predict(features_test,model)
+prediction= LogisticRegression.predict(features_test,model)
 baseline_prediction= MajorityClassifier.predictPol(features_test)
-
+  
 #logistic regression evaluation
 print "Average F1 : " +str(measures.avgF1(labels_test,prediction))
+print "Baseline AverageF1 : " +str(measures.avgF1(labels_test,baseline_prediction))
 print "Accuracy : " +str(measures.accuracy(labels_test,prediction))
 print "Baseline Accuracy : "+str(measures.accuracy(labels_test,baseline_prediction))
 print "F1 negative : " +str(measures.F1(labels_test,prediction,0))
@@ -83,8 +87,12 @@ print "Precision positive: " +str(measures.precision(labels_test,prediction,1))
 print "Recall negative : " +str(measures.recall(labels_test,prediction,0))
 print "Recall positive : " +str(measures.recall(labels_test,prediction,1))
 
-#plot learning curve
-learningCurves.plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
+#plot learning curves
+
+#learningCurves.plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
+learningCurves.plot_recall_precision(len(messages_train),features_train,labels_train,features_test,labels_test)
+learningCurves.plot_error_threshold(len(messages_train),features_train,labels_train,features_test,labels_test)
+
 
 ##if __name__ == "__main__":
 ##    main() 
