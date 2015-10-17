@@ -3,9 +3,11 @@ from morphologicalFeatures import *
 from posBasedFeatures import *
 from lexiconBasedFeatures import *
 from posBigramsFeatures import *
+from otherFeatures import *
+from clusterFeatures import *
 
 #return feautures of a list of messages as an array
-def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective):
+def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective, negationList,clusters):
     #initialize empty list with features for all message
     features = []
 
@@ -13,7 +15,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_big
     for i in range(0,len(messages)):
         
         #list with features for one message
-        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective)
+        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective,negationList,clusters)
 
         #add f to features
         features.append(f)
@@ -27,7 +29,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_big
     return features_array
 
 #calculate features for a message
-def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective):
+def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective,negationList,clusters):
     f=[]
     #Morphological Features
     
@@ -207,7 +209,18 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,po
     f.append(maximum)
         
 
+    #Other Features
 
+    #check if message has negation
+    x = hasNegation(tokens,negationList)
+    f.append(x)
+
+    #Word Clusters
+    tags = checkClusters(tokens,clusters)
+    f+=tags
+
+
+        
 
 
     return f

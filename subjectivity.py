@@ -1,15 +1,15 @@
 from tsvfiles import tsvreader
 from features_subjectivity import features
 from tokenizers import twokenize
-from postaggers import arktagger
-from lexicons import Slang
+from postaggers import arktagger 
 from evaluation import measures
 from classifiers import LogisticRegression, SVM, MajorityClassifier
 import matplotlib.pyplot as plt
 import numpy as np
 from nltk import bigrams
-from lexicons import SocalLexicon,MinqingHuLexicon,afinn,NRCLexicon,MPQALexicon,SentiWordNetLexicon
+from lexicons import negations,Slang,SocalLexicon,MinqingHuLexicon,afinn,NRCLexicon,MPQALexicon,SentiWordNetLexicon
 from lexicons.afinn import Afinn
+from clusters import Clusters
 import learningCurves
 import time
 
@@ -220,12 +220,16 @@ lexicons = [socal,minqinghu,afinn,nrc1,nrc2,nrc3,nrc4,nrc5,mpqa,swn]
 #assign a precision and F1 score to each word of a lexicon
 lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective  = getLexiconF1andPrecision(mpqa, messages_train, labels_train)
 
+#get negations list
+negationList = negations.loadNegations();
+
+#load word clusters
+clusters = Clusters.Clusters()
 
 #get features from train messages
-features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective)
-
+features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective, negationList,clusters)
 #get features from test messages 
-features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective)
+features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective, negationList,clusters)
 
 #train classifier and return trained model
 model = LogisticRegression.train(features_train,labels_train)
