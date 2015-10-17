@@ -17,7 +17,7 @@ def maxOfScores(lexicon,tokens,pos):
     else:
         max_score = abs(lexicon.score(tokens[0]))
 
-    for i in range(1,len(tokens)):
+    for i in range(1,len(pos)):
         if lexicon.__module__ == "lexicons.SentiWordNetLexicon":
             x = abs(lexicon.score(tokens[i],pos[i]))
         else:
@@ -39,7 +39,7 @@ def minOfScores(lexicon,tokens,pos):
     else:
         min_score = abs(lexicon.score(tokens[0]))
 
-    for i in range(1,len(tokens)):
+    for i in range(1,len(pos)):
         if lexicon.__module__ == "lexicons.SentiWordNetLexicon":
             x = abs(lexicon.score(tokens[i],pos[i]))
         else:
@@ -75,8 +75,16 @@ def scoreOfLastWord(lexicon,lastToken,lastPosTag):
 def scoreOfLastWordAppearedInLexicon(lexicon,tokens,pos):
     #iterate tokens from the end
     #if token is in lexicon then break
-    for i in range(len(tokens)-1,-1,-1):
+    for i in range(len(pos)-1,-1,-1):
         if numberOfAppearances(lexicon,tokens[i]) > 0:
             return sumOfScores(lexicon,tokens[i],tokens[i],pos[i])
 
     return 0
+
+def LexiconScores(scores,tokens):
+    s = []
+
+    for token in tokens:
+        s.append(scores.get(token,0))
+
+    return sum(s)/len(s), min(s), max(s)

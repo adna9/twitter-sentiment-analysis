@@ -5,7 +5,7 @@ from lexiconBasedFeatures import *
 from posBigramsFeatures import *
 
 #return feautures of a list of messages as an array
-def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective):
+def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective):
     #initialize empty list with features for all message
     features = []
 
@@ -13,7 +13,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_big
     for i in range(0,len(messages)):
         
         #list with features for one message
-        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective)
+        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective)
 
         #add f to features
         features.append(f)
@@ -27,7 +27,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_big
     return features_array
 
 #calculate features for a message
-def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective):
+def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective):
     f=[]
     #Morphological Features
     
@@ -179,6 +179,32 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,po
         x = scoreOfLastWordAppearedInLexicon(lexicon,tokens,pos)
         f.append(x)
 
+    #lexicon presicion and F1 scores
+    #lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective
+        
+    #precision-objective
+    average, minimum, maximum = LexiconScores(lexicon_precision_objective,tokens)
+    f.append(average)
+    f.append(minimum)
+    f.append(maximum)
+
+    #precision-subjective
+    average, minimum, maximum = LexiconScores(lexicon_precision_subjective,tokens)
+    f.append(average)
+    f.append(minimum)
+    f.append(maximum)
+
+    #F1-objective
+    average, minimum, maximum = LexiconScores(lexicon_f1_objective,tokens)
+    f.append(average)
+    f.append(minimum)
+    f.append(maximum)
+
+    #F1-subjective
+    average, minimum, maximum = LexiconScores(lexicon_f1_subjective,tokens)
+    f.append(average)
+    f.append(minimum)
+    f.append(maximum)
         
 
 

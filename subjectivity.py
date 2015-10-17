@@ -10,6 +10,7 @@ import numpy as np
 from nltk import bigrams
 from lexicons import SocalLexicon,MinqingHuLexicon,afinn,NRCLexicon,MPQALexicon,SentiWordNetLexicon
 from lexicons.afinn import Afinn
+import learningCurves
 import time
 
 def tokenize(l):
@@ -19,56 +20,6 @@ def tokenize(l):
         tokens.append(twokenize.simpleTokenize(item))
 
     return tokens
-
-def plot_learning_curve(length,features_train,labels_train,features_test,labels_test,title):
-    #run for every 10% of training set and compute training error and testing error
-    step = length/10
-    train_error = []
-    test_error = []
-    maj_clas_train_error = []
-    maj_clas_test_error = []
-
-    for i in range(0,10):
-        #train for (i+1)*10 percent of training set
-        f = features_train[0:((i+1)*(step))]
-        l=labels_train[0:((i+1)*(step))]
-
-        #train classifier for the specific subset of training set
-        model = LogisticRegression.train(f,l)
-
-        #get training error
-        prediction = LogisticRegression.predict(f,model)
-        train_error.append(measures.error(l,prediction))
-
-        #get testing error
-        prediction = LogisticRegression.predict(features_test,model)
-        test_error.append(measures.error(labels_test,prediction))
-
-        #get testing error for majority classifier
-        prediction = MajorityClassifier.predictSubj(features_test)
-        maj_clas_test_error.append(measures.error(labels_test,prediction))
-
-        #get training error for majority classifier
-        prediction = MajorityClassifier.predictSubj(f)
-        maj_clas_train_error.append(measures.error(l,prediction))
-
-
-    #insert bias
-    train_error.insert(0,0)
-    test_error.insert(0,1)
-    maj_clas_test_error.insert(0,maj_clas_test_error[0])
-    maj_clas_train_error.insert(0,1)
-    
-    x = np.arange(len(train_error))*10
-    plt.plot(x,train_error,label="Training Error")
-    plt.plot(x,test_error,label="Testing Error")
-    plt.plot(x,maj_clas_test_error,label="Majority Classifier - Testing Error")
-    plt.plot(x,maj_clas_train_error,label="Majority Classifier - Training Error")
-    plt.ylabel('error')
-    plt.xlabel("% of messages")
-    plt.title(title)
-    plt.legend()
-    plt.show()
 
 #calculate bigrams of every item of the list l
 def getBigrams(l):
@@ -137,6 +88,70 @@ def subList(pos_tags,labels,c):
 
     return sub
 
+def getLexiconF1andPrecision(lexicon, messages, labels):
+    #initialize dictionaries
+    precision_obj = {}
+    f1_obj = {}
+    precision_sub = {}
+    f1_sub = {}
+
+    #get all words from lexicon
+    words = lexicon.d.keys()
+
+    #number of messages that are objective
+    x1 = len([x for x in labels if x==0])
+    #number of messages that are subjective
+    x2 = len([x for x in labels if x==1])
+
+    for word in words:
+        #number of messages that contain "word" and are objective
+        x3 = 0
+        #number of messages that contain "word" and are subjective
+        x4 = 0
+        #number of messages that contain the "word"
+        x5 = 0
+
+        for i in range(0,len(messages)):
+            if (word in messages[i]):
+                x5+=1
+
+                if(labels[i]==0):
+                    x3+=1
+                else:
+                    x4+=1
+
+        #precision
+        if x5!=0:
+            precision_obj[word] = x3/float(x5)
+            precision_sub[word] = x4/float(x5)
+        else:
+            precision_obj[word] = 0
+            precision_sub[word] = 0
+
+        #recall
+        if x1==0:
+            recall_obj = 0
+        else:
+            recall_obj = x3/float(x1)
+            
+        if x2==0:
+            recall_sub = 0
+        else:
+            recall_sub = x4/float(x2)
+
+        #F1
+        if (precision_obj[word] + recall_obj)==0:
+            f1_obj[word] = 0
+        else:
+            f1_obj[word] = (2*precision_obj[word]*recall_obj)/float(precision_obj[word] + recall_obj)
+
+        if (precision_sub[word] + recall_sub)==0:
+            f1_sub[word] = 0
+        else:
+            f1_sub[word] = (2*precision_sub[word]*recall_sub)/float(precision_sub[word] + recall_sub)
+            
+
+    return precision_obj, f1_obj, precision_sub, f1_sub
 
 #def main():
 
@@ -202,11 +217,15 @@ swn = SentiWordNetLexicon.SentiWordNetLexicon()
 
 lexicons = [socal,minqinghu,afinn,nrc1,nrc2,nrc3,nrc4,nrc5,mpqa,swn]
 
+#assign a precision and F1 score to each word of a lexicon
+lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective  = getLexiconF1andPrecision(mpqa, messages_train, labels_train)
+
+
 #get features from train messages
-features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective)
+features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective)
 
 #get features from test messages 
-features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective)
+features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective)
 
 #train classifier and return trained model
 model = LogisticRegression.train(features_train,labels_train)
@@ -228,7 +247,7 @@ print "Recall Subjective : " +str(measures.recall(labels_test,prediction,1))
 
 
 #plot learning curve
-#plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test,"Error")
+#learningCurves.plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
 
 print("--- %s seconds ---" % (time.time() - start_time))
 
