@@ -13,6 +13,8 @@ class Clusters():
         # d [cluster_id] = word_list 
         self.d = {}
 
+        self.keys = []
+
         #load cluster
         self.loadClusters()
 
@@ -25,11 +27,13 @@ class Clusters():
             cluster_id = line.split("\t")[0]
             word = line.split("\t")[1]
             
-            if cluster_id not in self.d.keys():
-                #new entry
-                self.d[cluster_id] = []
-
-            #add new word
-            self.d[cluster_id].append(word)
-
+##            if cluster_id not in self.d.keys():
+##                #new entry
+##                self.d[cluster_id] = []
+##
+##            #add new word
+##            self.d[cluster_id].append(word)
+            self.d[word] = cluster_id
         f.close()
+
+        self.keys = list(set(self.d.values()))
