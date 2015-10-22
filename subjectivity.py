@@ -14,18 +14,20 @@ from utilities import *
 import learningCurves
 import time
 
-#def main():
+#def classify(train,test):
 
 start_time = time.time()
 
 #load training set
 dataset_train = "datasets/training-set-sample.tsv"
 #dataset_train = "datasets/train15.tsv"
+#dataset_train = train
 labels_train, messages_train = tsvreader.opentsv(dataset_train)
 
 #load testing set
 #dataset_test = "datasets/dev15.tsv"
 dataset_test = "datasets/testing-set-sample.tsv"
+#dataset_test = test
 labels_test, messages_test = tsvreader.opentsv(dataset_test)
 
 #load Slang Dictionary
@@ -59,24 +61,22 @@ pos_bigrams_scores_subjective = posBigramsScore(unique_bigrams,1,pos_bigrams_tra
 
 #Load Lexicons
 
-#Socal Lexicon
-socal = SocalLexicon.SocalLexicon()
 #Minqing Hu Lexicon
 minqinghu = MinqingHuLexicon.MinqingHuLexicon()
 #Afinn Lexicon
 afinn = Afinn()
-#NRC Lexicon - 5 different versions
-nrc1 = NRCLexicon.NRCLexicon(0)
+#NRC Lexicons
 nrc2 = NRCLexicon.NRCLexicon(1)
-nrc3 = NRCLexicon.NRCLexicon(2)
-nrc4 = NRCLexicon.NRCLexicon(3)
 nrc5 = NRCLexicon.NRCLexicon(4)
+nrc6 = NRCLexicon.NRCLexicon(5)
 #MPQA Lexicon
 mpqa = MPQALexicon.MPQALexicon()
 #SentiWordNet Lexicon
-swn = SentiWordNetLexicon.SentiWordNetLexicon()
+swn = SentiWordNetLexicon.SentiWordNetLexicon(False)
+#SentiWordNet Lexicon - AverageScores
+swn_avg= SentiWordNetLexicon.SentiWordNetLexicon(True)
 
-lexicons = [socal,minqinghu,afinn,nrc1,nrc2,nrc3,nrc4,nrc5,mpqa,swn]
+lexicons = [minqinghu,afinn,nrc2,nrc5,nrc6,mpqa,swn,swn_avg]
 
 #assign a precision and F1 score to each word of a lexicon
 lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective  = getLexiconF1andPrecision(mpqa, messages_train, labels_train)
@@ -111,12 +111,9 @@ print "Recall Objective : " +str(measures.recall(labels_test,prediction,0))
 print "Recall Subjective : " +str(measures.recall(labels_test,prediction,1))
 
 
+
+
 #plot learning curve
 #learningCurves.plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
 
 print("--- %s seconds ---" % (time.time() - start_time))
-
-##if __name__ == "__main__":
-##    main() 
-    
-

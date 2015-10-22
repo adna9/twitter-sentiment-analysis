@@ -7,21 +7,33 @@ def sumOfScores(lexicon,message,tokens,pos):
         return lexicon.score(tokens)
 
 
-def maxOfScores(lexicon,tokens,pos):
+def maxOfScores(lexicon,tokens,pos,polarity_detection):
 
     #we use absolute values because both positive and negative values
     #are considered subjective
     
     if lexicon.__module__ == "lexicons.SentiWordNetLexicon":
-        max_score = abs(lexicon.score(tokens[0],pos[0]))
+        if polarity_detection:
+            max_score = lexicon.score(tokens[0],pos[0])
+        else:
+            max_score = abs(lexicon.score(tokens[0],pos[0]))
     else:
-        max_score = abs(lexicon.score(tokens[0]))
+        if polarity_detection:
+            max_score = lexicon.score(tokens[0])
+        else:
+            max_score = abs(lexicon.score(tokens[0]))
 
     for i in range(1,len(pos)):
         if lexicon.__module__ == "lexicons.SentiWordNetLexicon":
-            x = abs(lexicon.score(tokens[i],pos[i]))
+            if polarity_detection:
+                x = lexicon.score(tokens[i],pos[i])
+            else:
+                x = abs(lexicon.score(tokens[i],pos[i]))
         else:
-            x = abs(lexicon.score(tokens[i]))
+            if polarity_detection:
+                x = lexicon.score(tokens[i])
+            else:
+                x = abs(lexicon.score(tokens[i]))
 
         if x > max_score:
             max_score = x
@@ -29,21 +41,33 @@ def maxOfScores(lexicon,tokens,pos):
 
     return max_score
 
-def minOfScores(lexicon,tokens,pos):
+def minOfScores(lexicon,tokens,pos,polarity_detection):
     
     #we use absolute values because both positive and negative values
     #are considered subjective
     
     if lexicon.__module__ == "lexicons.SentiWordNetLexicon":
-        min_score = abs(lexicon.score(tokens[0],pos[0]))
+        if polarity_detection:
+            min_score = lexicon.score(tokens[0],pos[0])
+        else:
+            min_score = abs(lexicon.score(tokens[0],pos[0]))
     else:
-        min_score = abs(lexicon.score(tokens[0]))
+        if polarity_detection:
+            min_score = lexicon.score(tokens[0])
+        else:
+            min_score = abs(lexicon.score(tokens[0]))
 
     for i in range(1,len(pos)):
         if lexicon.__module__ == "lexicons.SentiWordNetLexicon":
-            x = abs(lexicon.score(tokens[i],pos[i]))
+            if polarity_detection:
+                x = lexicon.score(tokens[i],pos[i])
+            else:
+                x = abs(lexicon.score(tokens[i],pos[i]))
         else:
-            x = abs(lexicon.score(tokens[i]))
+            if polarity_detection:
+                x = lexicon.score(tokens[i])
+            else:
+                x = abs(lexicon.score(tokens[i]))
 
         if x < min_score:
             min_score = x

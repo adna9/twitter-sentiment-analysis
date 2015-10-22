@@ -24,6 +24,8 @@ class NRCLexicon():
             self.loadSentiment140Lexicon1()
         elif lexicon == 4 :
             self.loadSentiment140Lexicon2()
+        elif lexicon == 5 :
+            self.loadEmotionLexicon()
         else:
             print "Lexicon unavailable, please load another one"
 
@@ -99,6 +101,32 @@ class NRCLexicon():
 
         #load bigrams
         self.loadBigrams(NRCLexicon.directory+folder+file2)
+
+    #NRC-Emotion-Lexicon-v0.92
+    def loadEmotionLexicon(self):
+        folder = "NRC-Emotion-Lexicon-v0.92/"
+        file1 = "NRC-emotion-lexicon-wordlevel-alphabetized-v0.92.txt"
+
+        #clear previous dictionaries
+        self.clearDictionaries()
+
+        #positive_emotions = ["joy", "surprise", "anticipation", "trust"]
+        #negative_emotions= ["sadness", "fear", "anger", "disgust"]
+
+        #load Lexicon
+        f = open(NRCLexicon.directory+folder+file1)
+
+        #self.d_unigrams = {}
+
+        for line in f.readlines():
+            key = line.split("\t")[0]
+            value = line.split("\t")[2]
+
+            if key not in self.d_unigrams.keys():
+                self.d_unigrams[key]=0
+
+            self.d_unigrams[key]+=float(value)
+            
 
     #clear dictionaries
     def clearDictionaries(self):

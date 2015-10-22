@@ -160,11 +160,11 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,po
         f.append(x/float(len(tokens)))
 
         #max score of words
-        x = maxOfScores(lexicon,tokens,pos)
+        x = maxOfScores(lexicon,tokens,pos,True)
         f.append(x)
 
         #min score of words
-        x = minOfScores(lexicon,tokens,pos)
+        x = minOfScores(lexicon,tokens,pos,True)
         f.append(x)
 
         #the count of words of the message that appear in the lexicon
