@@ -58,8 +58,7 @@ def plotLengthDistribution(l,t):
     
 #read labels and messages from dataset
 #dataset = "datasets/tweets#2015.tsv"
-#dataset = "datasets/twitter-dev-gold-B.tsv"
-dataset = "datasets/dev16.tsv"
+dataset = "datasets/twitter-dev-gold-B.tsv"
 labels, messages = tsvreader.opentsv(dataset)
 neutral_messages = subList(messages,labels,"neutral")
 positive_messages = subList(messages,labels,"positive")
@@ -157,7 +156,7 @@ ax = fig.add_subplot(111)
 cmap = plt.cm.prism
 pie_labels = ["neutral :"+str(total_neutral),"positive : "+str(total_positive),"negative : "+str(total_negative)]
 ax.pie(slices,labels=pie_labels,labeldistance=1.05)
-ax.set_title("Developement set 16 \nTotal number of messages : "+str(total))
+ax.set_title("Training set 13 \nTotal number of messages : "+str(total))
 plt.show()
 
 #plot length of messages

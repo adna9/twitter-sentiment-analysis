@@ -25,24 +25,24 @@ def plot_learning_curve(length,features_train,labels_train,features_test,labels_
 
         #get training error
         prediction = LogisticRegression.predict(f,model)
-        train.append(measures.error(l,prediction))
+        train.append(measures.F1(l,prediction,0))
 
         #get testing error
         prediction = LogisticRegression.predict(features_test,model)
-        test.append(measures.error(labels_test,prediction))
+        test.append(measures.F1(labels_test,prediction,0))
 
         #get error for majority classifier
         prediction = MajorityClassifier.predictPol(features_test)
-        maj_clas.append(measures.error(labels_test,prediction))
+        maj_clas.append(measures.F1(labels_test,prediction,0))
 
    
    
     x = np.arange(len(train))*10
-    plt.plot(x,train,color="blue",linewidth="2.0",label="Training error")
-    plt.plot(x,test,color="blue",linestyle="dashed",linewidth="2.0",label="Testing error")
-    plt.plot(x,maj_clas,color="red",linewidth="2.0",label="Majority Classifier error")
+    plt.plot(x,train,color="blue",linewidth="2.0",label="Training F1")
+    plt.plot(x,test,color="blue",linestyle="dashed",linewidth="2.0",label="Testing F1")
+    plt.plot(x,maj_clas,color="red",linewidth="2.0",label="Majority Classifier F1")
     plt.ylim(0,1)
-    plt.ylabel('error')
+    plt.ylabel('F1')
     plt.xlabel("% of messages")
     plt.legend(loc="upper left")
     plt.show()
@@ -72,16 +72,16 @@ def plot_recall_precision(length,features_train,labels_train,features_test,label
 
             prediction = LogisticRegression.predict(features_test,model,t)
             
-            recall.append(measures.recall(labels_test,prediction,1))
-            precision.append(measures.precision(labels_test,prediction,1))
+            recall.append(measures.recall(labels_test,prediction,0))
+            precision.append(measures.precision(labels_test,prediction,0))
 
         plt.plot(recall,precision,linewidth="2.0",label=str((i+1)*33)+"% of train data",color=colors[i])
 
-    plt.xlim(0.4,1)
-    plt.ylim(0.4,1)
+    plt.xlim(0.3,1)
+    plt.ylim(0,1)
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.title('Positive tweets')
+    plt.title('Negative tweets')
     plt.legend()
     
     plt.show()
