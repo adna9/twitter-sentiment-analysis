@@ -5,12 +5,12 @@ from postaggers import arktagger
 from nltk import bigrams
 from nltk import trigrams
 from lexicons import Slang
-from lexicons import SocalLexicon 
+from lexicons import SocalLexicon,negations 
 from evaluation import measures
 from classifiers import LogisticRegression, SVM, MajorityClassifier,KNN
 import learningCurves
-
-
+from clusters import Clusters
+import pos_bigrams_scores
 
 def tokenize(l):
     tokens=[]
@@ -23,11 +23,13 @@ def tokenize(l):
 #def main():
 
 #load training set
-dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/train15.tsv"
+dataset_train="datasets/training-set-sample.tsv"
 labels_train, messages_train = tsvreader.opentsvPolarity(dataset_train)
 
 #load testing set
-dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/dev15.tsv"
+dataset_test="datasets/testing-set-sample.tsv"
 labels_test, messages_test = tsvreader.opentsvPolarity(dataset_test)
 
 #load Slang Dictionary
@@ -36,6 +38,12 @@ slangDictionary = Slang.Slang()
 #load SocalLexicon
 lex =SocalLexicon.SocalLexicon()
 lex.loadLexicon()
+
+#get negations list
+negationList = negations.loadNegations();
+
+#load word clusters
+clusters = Clusters.Clusters()
 
 # 0 - negative messages 
 # 1 - positive messages
@@ -54,15 +62,23 @@ pos_tags_test = arktagger.pos_tag_list(messages_test)
 bigrams_train=[bigrams(x) for x in pos_tags_train]
 bigrams_test =[bigrams(x) for x in pos_tags_test]
 
+#get the unique pos bigrams from training set
+unique_bigrams = pos_bigrams_scores.getBigramsSet(bigrams_train)
+
+pos_bigrams_scores_negative = pos_bigrams_scores.posBigramsScore(unique_bigrams,0,bigrams_train,labels_train)
+pos_bigrams_scores_positive = pos_bigrams_scores.posBigramsScore(unique_bigrams,1,bigrams_train,labels_train)
+
 #compute trigrams for all messages
 trigrams_train=[trigrams(x) for x in pos_tags_train]
 trigrams_test =[trigrams(x) for x in pos_tags_test]
 
 #get features from train messages
-features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,bigrams_train,trigrams_train, slangDictionary,lex)
+features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,bigrams_train,pos_bigrams_scores_negative,pos_bigrams_scores_positive,trigrams_train, slangDictionary,negationList,lex,clusters)
 
 #get features from test messages 
-features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,bigrams_test,trigrams_test,slangDictionary,lex)
+features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,bigrams_test,pos_bigrams_scores_negative,pos_bigrams_scores_positive,trigrams_test,slangDictionary,negationList,lex,clusters)
+
+#RFE.RFE(features_train,labels_train,5)
 
 #train classifier and return trained model
 model = LogisticRegression.train(features_train,labels_train)
@@ -74,7 +90,7 @@ model = LogisticRegression.train(features_train,labels_train)
 #prediction = KNN.predict(features_test,model)
 prediction= LogisticRegression.predict(features_test,model)
 baseline_prediction= MajorityClassifier.predictPol(features_test)
-  
+
 #logistic regression evaluation
 print "Average F1 : " +str(measures.avgF1(labels_test,prediction))
 print "Baseline AverageF1 : " +str(measures.avgF1(labels_test,baseline_prediction))
@@ -91,7 +107,7 @@ print "Recall positive : " +str(measures.recall(labels_test,prediction,1))
 
 #learningCurves.plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
 learningCurves.plot_recall_precision(len(messages_train),features_train,labels_train,features_test,labels_test)
-learningCurves.plot_error_threshold(len(messages_train),features_train,labels_train,features_test,labels_test)
+#learningCurves.plot_error_threshold(len(messages_train),features_train,labels_train,features_test,labels_test)
 
 
 ##if __name__ == "__main__":
