@@ -219,8 +219,7 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,po
     tags = checkClusters(tokens,clusters)
     f+=tags
 
-
-        
+    
 
 
     return f

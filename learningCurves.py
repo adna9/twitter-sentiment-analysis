@@ -77,8 +77,8 @@ def plot_recall_precision(length,features_train,labels_train,features_test,label
 
         plt.plot(recall,precision,linewidth="2.0",label=str((i+1)*33)+"% of train data",color=colors[i])
 
-    plt.xlim(0,1)
-    plt.ylim(0,1)
+    plt.xlim(0.4,1)
+    plt.ylim(0.4,1)
     plt.xlabel('Recall')
     plt.ylabel('Precision')
     plt.title('Positive tweets')

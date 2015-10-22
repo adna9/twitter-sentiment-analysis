@@ -252,7 +252,7 @@ print "Recall Subjective : " +str(measures.recall(labels_test,prediction,1))
 
 #plot learning curve
 #learningCurves.plot_learning_curve(len(messages_train),features_train,labels_train,features_test,labels_test)
-
+#learningCurves.plot_recall_precision(len(messages_train),features_train,labels_train,features_test,labels_test)
 print("--- %s seconds ---" % (time.time() - start_time))
 
 ##if __name__ == "__main__":

@@ -7,8 +7,14 @@ def opentsv(filepath):
 
     for line in data.readlines():
         line=unicode(line,"utf-8")
-        labels.append(line.split("\t")[2])
-        messages.append(line.split("\t")[3])
+        l = len(line.split("\t"))
+        if l==4:
+            labels.append(line.split("\t")[2])
+            messages.append(line.split("\t")[3])
+        elif l==3:
+            labels.append(line.split("\t")[1])
+            messages.append(line.split("\t")[2])
+            
 
     data.close()
 
