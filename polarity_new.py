@@ -61,24 +61,24 @@ unique_bigrams = getBigramsSet(pos_bigrams_train)
 pos_bigrams_scores_negative = posBigramsScore(unique_bigrams,0,pos_bigrams_train,labels_train)
 pos_bigrams_scores_positive = posBigramsScore(unique_bigrams,1,pos_bigrams_train,labels_train)
 
-#Load Lexicons
+#Load Lexicons -> afisa mono osa exei kai o Mixalis
 
-#Socal Lexicon
-socal = SocalLexicon.SocalLexicon()
 #Minqing Hu Lexicon
 minqinghu = MinqingHuLexicon.MinqingHuLexicon()
 #Afinn Lexicon
 afinn = Afinn()
-#NRC Lexicon - 5 different versions
-nrc1 = NRCLexicon.NRCLexicon(0)
+#NRC Lexicons
 nrc2 = NRCLexicon.NRCLexicon(1)
-nrc3 = NRCLexicon.NRCLexicon(2)
-nrc4 = NRCLexicon.NRCLexicon(3)
 nrc5 = NRCLexicon.NRCLexicon(4)
+nrc6 = NRCLexicon.NRCLexicon(5)
 #MPQA Lexicon
 mpqa = MPQALexicon.MPQALexicon()
+#SentiWordNet Lexicon
+swn = SentiWordNetLexicon.SentiWordNetLexicon(False)
+#SentiWordNet Lexicon - AverageScores
+swn_avg= SentiWordNetLexicon.SentiWordNetLexicon(True)
 
-lexicons = [socal,minqinghu,afinn,nrc1,nrc2,nrc3,nrc4,nrc5,mpqa]
+lexicons = [minqinghu,afinn,nrc2,nrc5,nrc6,mpqa,swn,swn_avg]
 
 #assign a precision and F1 score to each word of a lexicon
 lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive  = getLexiconF1andPrecision(mpqa, messages_train, labels_train)
