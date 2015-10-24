@@ -7,7 +7,7 @@ from otherFeatures import *
 from clusterFeatures import *
 
 #return feautures of a list of messages as an array
-def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive, negationList,clusters):
+def getFeatures(messages,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters):
     #initialize empty list with features for all message
     features = []
 
@@ -15,7 +15,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_big
     for i in range(0,len(messages)):
         
         #list with features for one message
-        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,pos_bigrams[i],pos_bigrams_scores_negative,pos_bigrams_scores_positive,lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive,negationList,clusters)
+        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,mpqa_lexicons,pos_bigrams[i],pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters)
 
         #add f to features
         features.append(f)
@@ -29,7 +29,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_big
     return features_array
 
 #calculate features for a message
-def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive,negationList,clusters):
+def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters):
 
     f=[]
 
@@ -73,6 +73,18 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,po
 
     #the sum of exclamation and question marks
     x = ex + qu
+    f.append(x)
+
+    #the number of tokens containing only exclamation marks
+    x = onlyQuestionMarks(tokens)
+    f.append(x)
+
+    #the number of tokens containing only exclamation marks
+    x = onlyExclamationMarks(tokens)
+    f.append(x)
+
+    #the number of tokens containing only exclamation marks
+    x = onlyQuestionOrExclamationMarks(tokens)
     f.append(x)
 
     #the number of tokens containing only ellipsis (...)
@@ -179,35 +191,46 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,pos_bigrams,po
         x = scoreOfLastWordAppearedInLexicon(lexicon,tokens,pos)
         f.append(x)
 
+    #iterate for every mpqa lexicon (no score features because the mpqa lexicons have no subjectivity scores assinged to words)
+    for lexicon in mpqa_lexicons:
+        #the count of words of the message that appear in the lexicon
+        x = numberOfAppearances(lexicon,tokens)
+        f.append(x)
+
     #lexicon presicion and F1 scores
     #lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective
         
-    #precision-objective
-    average, minimum, maximum = LexiconScores(lexicon_precision_negative,tokens)
-    f.append(average)
-    f.append(minimum)
-    f.append(maximum)
+    #lexicon presicion and F1 scores
+    #lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective
 
-    #precision-subjective
-    average, minimum, maximum = LexiconScores(lexicon_precision_positive,tokens)
-    f.append(average)
-    f.append(minimum)
-    f.append(maximum)
+    #iterate for every mpqa lexicon
 
-    #F1-objective
-    average, minimum, maximum = LexiconScores(lexicon_f1_negative,tokens)
-    f.append(average)
-    f.append(minimum)
-    f.append(maximum)
+    for i in range(0,len(mpqaScores),4):    
+        #precision-objective
+        average, minimum, maximum = LexiconScores(mpqaScores[i],tokens)
+        f.append(average)
+        f.append(minimum)
+        f.append(maximum)
 
-    #F1-subjective
-    average, minimum, maximum = LexiconScores(lexicon_f1_positive,tokens)
-    f.append(average)
-    f.append(minimum)
-    f.append(maximum)
-        
+        #precision-subjective
+        average, minimum, maximum = LexiconScores(mpqaScores[i+1],tokens)
+        f.append(average)
+        f.append(minimum)
+        f.append(maximum)
 
-    # #Other Features
+        #F1-objective
+        average, minimum, maximum = LexiconScores(mpqaScores[i+2],tokens)
+        f.append(average)
+        f.append(minimum)
+        f.append(maximum)
+
+        #F1-subjective
+        average, minimum, maximum = LexiconScores(mpqaScores[i+3],tokens)
+        f.append(average)
+        f.append(minimum)
+        f.append(maximum)
+
+    #Other Features
 
     #check if message has negation
     x = hasNegation(tokens,negationList)

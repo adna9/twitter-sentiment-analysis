@@ -16,15 +16,15 @@ def tokenize(l):
 
     return tokens
 
-def getLexiconF1andPrecision(lexicon, messages, labels):
-    #initialize dictionaries
+def getLexiconF1andPrecision(l, messages, labels):
+    #initialize dictionaries (exactly the same for positive-negative messages)
     precision_obj = {}
     f1_obj = {}
     precision_sub = {}
     f1_sub = {}
 
     #get all words from lexicon
-    words = lexicon.d.keys()
+    words = l.lexicon
 
     #number of messages that are objective
     x1 = len([x for x in labels if x==0])
@@ -80,6 +80,20 @@ def getLexiconF1andPrecision(lexicon, messages, labels):
             
 
     return precision_obj, f1_obj, precision_sub, f1_sub
+
+#calculate F1 and Precision scores for every word of every lexicon
+def getScores(lexicons,messages, labels):
+    scores = []
+    for lexicon in lexicons:
+        x1, x2, x3, x4 = getLexiconF1andPrecision(lexicon, messages, labels)
+        scores.append(x1)
+        scores.append(x2)
+        scores.append(x3)
+        scores.append(x4)
+
+    return scores
+        
+    
 def getBigramsSet(pos_bigrams):
     s = set()
     

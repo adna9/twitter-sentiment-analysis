@@ -71,17 +71,27 @@ afinn = Afinn()
 nrc2 = NRCLexicon.NRCLexicon(1)
 nrc5 = NRCLexicon.NRCLexicon(4)
 nrc6 = NRCLexicon.NRCLexicon(5)
-#MPQA Lexicon
-mpqa = MPQALexicon.MPQALexicon()
 #SentiWordNet Lexicon
 swn = SentiWordNetLexicon.SentiWordNetLexicon(False)
 #SentiWordNet Lexicon - AverageScores
 swn_avg= SentiWordNetLexicon.SentiWordNetLexicon(True)
 
-lexicons = [minqinghu,afinn,nrc2,nrc5,nrc6,mpqa,swn,swn_avg]
+lexicons = [minqinghu,afinn,nrc2,nrc5,nrc6,swn,swn_avg]
 
-#assign a precision and F1 score to each word of a lexicon
-lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive  = getLexiconF1andPrecision(mpqa, messages_train, labels_train)
+#MPQA Lexicons (8 Lexicons)
+S_pos = MPQALexicon.MPQALexicon(0)
+S_neg = MPQALexicon.MPQALexicon(1)
+S_pos_neg = MPQALexicon.MPQALexicon(2)
+S_neu = MPQALexicon.MPQALexicon(3)
+W_pos = MPQALexicon.MPQALexicon(4)
+W_neg = MPQALexicon.MPQALexicon(5)
+W_pos_neg = MPQALexicon.MPQALexicon(6)
+W_neu = MPQALexicon.MPQALexicon(7)
+
+mpqa_lexicons = [S_pos,S_neg,S_pos_neg,S_neu,W_pos,W_neg,W_pos_neg,W_neu]
+
+#assign a precision and F1 score to each word of to all mpqa lexicons
+mpqaScores = getScores(mpqa_lexicons,messages_train,labels_train)
 
 #get negations list
 negationList = negations.loadNegations();
@@ -90,9 +100,10 @@ negationList = negations.loadNegations();
 clusters = Clusters.Clusters()
 
 #get features from train messages
-features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,pos_bigrams_train,pos_bigrams_scores_negative,pos_bigrams_scores_positive,lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive, negationList,clusters)
+features_train = features.getFeatures(messages_train,tokens_train,pos_tags_train,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_train,pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters)
 #get features from test messages 
-features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,pos_bigrams_test,pos_bigrams_scores_negative,pos_bigrams_scores_positive,lexicon_precision_negative, lexicon_f1_negative, lexicon_precision_positive, lexicon_f1_positive, negationList,clusters)
+features_test = features.getFeatures(messages_test,tokens_test,pos_tags_test,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_test,pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters)
+
 
 #train classifier and return trained model
 model = LogisticRegression.train(features_train,labels_train)

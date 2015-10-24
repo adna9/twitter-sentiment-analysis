@@ -91,6 +91,33 @@ def countExclamationMarks(message):
 def countQuestionMarks(message):
     return message.count("?")
 
+#the number of tokens containing only exclamation marks
+def onlyQuestionMarks(tokens):
+    x = 0
+    for token in tokens:
+        if token.count("?") == len(token):
+            x+=1
+
+    return x
+
+#the number of tokens containing only exclamation marks
+def onlyExclamationMarks(tokens):
+    x = 0
+    for token in tokens:
+        if token.count("!") == len(token):
+            x+=1
+
+    return x
+
+#the number of tokens containing only exclamation marks
+def onlyQuestionOrExclamationMarks(tokens):
+    x = 0
+    for token in tokens:
+        if (token.count("?") + token.count("!")) == len(token):
+            x+=1
+
+    return x
+
 #compute the number of tokens containing only ellipsis (...)
 def countEllipsis(tokens):
     return len([word for word in tokens if word=="..."])
@@ -137,3 +164,4 @@ def hasSlang(tokens,slangDictionary):
             return 1
 
     return 0
+
