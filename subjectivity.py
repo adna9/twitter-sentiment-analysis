@@ -19,14 +19,14 @@ import time
 start_time = time.time()
 
 #load training set
-dataset_train = "datasets/training-set-sample.tsv"
-#dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/training-set-sample.tsv"
+dataset_train = "datasets/train15.tsv"
 #dataset_train = train
 labels_train, messages_train = tsvreader.opentsv(dataset_train)
 
 #load testing set
-#dataset_test = "datasets/dev15.tsv"
-dataset_test = "datasets/testing-set-sample.tsv"
+dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/testing-set-sample.tsv"
 #dataset_test = test
 labels_test, messages_test = tsvreader.opentsv(dataset_test)
 
@@ -54,6 +54,7 @@ pos_bigrams_test = getBigrams(pos_tags_test)
 
 #get the unique pos bigrams from training set
 unique_bigrams = getBigramsSet(pos_bigrams_train)
+
 #calculate pos bigrams score for all categories
 #both dictionaries will be used for training and testing (cannot create new for testing because we don't know the labels of the new messages)
 pos_bigrams_scores_objective = posBigramsScore(unique_bigrams,0,pos_bigrams_train,labels_train)

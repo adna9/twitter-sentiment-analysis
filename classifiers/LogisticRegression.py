@@ -3,9 +3,9 @@
 from sklearn.linear_model import LogisticRegression
 
 #train model
-def train(features,labels):
+def train(features,labels,c=1e5):
     #define classifier
-    model = LogisticRegression(C=1e5)
+    model = LogisticRegression(C=c)
 
     #fit the data
     model.fit(features, labels)

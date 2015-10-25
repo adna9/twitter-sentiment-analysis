@@ -236,6 +236,19 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
     x = hasNegation(tokens,negationList)
     f.append(x)
 
+    #check if message has negation preceding words from lexicon
+    x = hasNegationPrecedingLexicon(mpqa_lexicons[0],tokens,negationList)
+    f.append(x)
+
+    x = hasNegationPrecedingLexicon(mpqa_lexicons[1],tokens,negationList)
+    f.append(x)
+
+    x = hasNegationPrecedingLexicon(mpqa_lexicons[4],tokens,negationList)
+    f.append(x)
+
+    x = hasNegationPrecedingLexicon(mpqa_lexicons[5],tokens,negationList)
+    f.append(x)
+
     #Word Clusters
     tags = checkClusters(tokens,clusters)
     f+=tags

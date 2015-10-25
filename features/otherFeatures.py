@@ -6,6 +6,21 @@ def hasNegation(tokens,negationList):
 
     return 0
 
+#check if message has negation preceding words from lexicon
+def hasNegationPrecedingLexicon(lexicon,tokens,negationList):
+    for i in range(0,len(tokens)):
+        if tokens[i] in lexicon.lexicon:
+            #get 5 preciding tokens
+            subList = tokens[max(0,i-5):i]
+
+            #check if these tokens are in the lexicon
+            for token in subList:
+                if token in negationList:
+                    return 1
+
+    return 0
+            
+    
 #calculate the number of subjective emoticons
 def happy_emoticons(tokens):
     
