@@ -155,7 +155,7 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
     f.append(maximum)
     f.append(minimum)
 
-    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
+    #the average,maximun,minium f1 score for the messages pos bigrams for subjective messages
     average, maximum, minimum = F1PosBigramsScore(pos_bigrams,pos_bigrams_scores_subjective)
     f.append(average)
     f.append(maximum)
