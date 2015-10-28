@@ -7,7 +7,7 @@ from otherFeatures import *
 from clusterFeatures import *
 
 #return feautures of a list of messages as an array
-def getFeatures(messages,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters):
+def getFeatures(messages,process_messages,tokens,process_tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters):
     #initialize empty list with features for all message
     features = []
 
@@ -15,7 +15,7 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_b
     for i in range(0,len(messages)):
         
         #list with features for one message
-        f = calculateFeatures(messages[i],tokens[i],pos[i],slangDictionary,lexicons,mpqa_lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
+        f = calculateFeatures(messages[i],process_messages[i],tokens[i],process_tokens[i],pos[i],slangDictionary,lexicons,mpqa_lexicons,pos_bigrams[i],pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
 
         #add f to features
         features.append(f)
@@ -29,7 +29,9 @@ def getFeatures(messages,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_b
     return features_array
 
 #calculate features for a message
-def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters):
+def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters):
+    
+
     f=[]
     #Morphological Features
     
@@ -136,15 +138,15 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
     f.append(x)
 
     #the number of proper nouns
-    x = numberOfProperNouns(pos,tokens)
+    x = numberOfProperNouns(pos,process_tokens)
     f.append(x)
 
     #the number of urls
-    x = numberOfUrls(pos,tokens)
+    x = numberOfUrls(pos,process_tokens)
     f.append(x)
 
     #the number of subjective emoticons
-    x = numberOfSubjectiveEmoticons(pos,tokens)
+    x = numberOfSubjectiveEmoticons(pos,process_tokens)
     f.append(x)
 
     #Pos Bigrams Features
@@ -155,7 +157,7 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
     f.append(maximum)
     f.append(minimum)
 
-    #the average,maximun,minium f1 score for the messages pos bigrams for subjective messages
+    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
     average, maximum, minimum = F1PosBigramsScore(pos_bigrams,pos_bigrams_scores_subjective)
     f.append(average)
     f.append(maximum)
@@ -167,36 +169,36 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
     #iterate for every lexicon
     for lexicon in lexicons:
         #score of lexicon (total score of all words)
-        x = sumOfScores(lexicon,message,tokens,pos)
+        x = sumOfScores(lexicon,process_message,process_tokens,pos)
         f.append(x)
 
         #average of scores
-        f.append(x/float(len(tokens)))
+        f.append(x/float(len(process_tokens)))
 
         #max score of words
-        x = maxOfScores(lexicon,tokens,pos,False)
+        x = maxOfScores(lexicon,process_tokens,pos,False)
         f.append(x)
 
         #min score of words
-        x = minOfScores(lexicon,tokens,pos,False)
+        x = minOfScores(lexicon,process_tokens,pos,False)
         f.append(x)
 
         #the count of words of the message that appear in the lexicon
-        x = numberOfAppearances(lexicon,tokens)
+        x = numberOfAppearances(lexicon,process_tokens)
         f.append(x)
 
         #the score of the last word of the message
-        x = scoreOfLastWord(lexicon,tokens[len(tokens)-1],pos[len(pos)-1])
+        x = scoreOfLastWord(lexicon,process_tokens[len(process_tokens)-1],pos[len(pos)-1])
         f.append(x)
 
         #the score of the last word of the message that appears in the lexicon
-        x = scoreOfLastWordAppearedInLexicon(lexicon,tokens,pos)
+        x = scoreOfLastWordAppearedInLexicon(lexicon,process_tokens,pos)
         f.append(x)
 
     #iterate for every mpqa lexicon (no score features because the mpqa lexicons have no subjectivity scores assinged to words)
     for lexicon in mpqa_lexicons:
         #the count of words of the message that appear in the lexicon
-        x = numberOfAppearances(lexicon,tokens)
+        x = numberOfAppearances(lexicon,process_tokens)
         f.append(x)
 
     #lexicon presicion and F1 scores
@@ -206,25 +208,25 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
 
     for i in range(0,len(mpqaScores),4):    
         #precision-objective
-        average, minimum, maximum = LexiconScores(mpqaScores[i],tokens)
+        average, minimum, maximum = LexiconScores(mpqaScores[i],process_tokens)
         f.append(average)
         f.append(minimum)
         f.append(maximum)
 
         #precision-subjective
-        average, minimum, maximum = LexiconScores(mpqaScores[i+1],tokens)
+        average, minimum, maximum = LexiconScores(mpqaScores[i+1],process_tokens)
         f.append(average)
         f.append(minimum)
         f.append(maximum)
 
         #F1-objective
-        average, minimum, maximum = LexiconScores(mpqaScores[i+2],tokens)
+        average, minimum, maximum = LexiconScores(mpqaScores[i+2],process_tokens)
         f.append(average)
         f.append(minimum)
         f.append(maximum)
 
         #F1-subjective
-        average, minimum, maximum = LexiconScores(mpqaScores[i+3],tokens)
+        average, minimum, maximum = LexiconScores(mpqaScores[i+3],process_tokens)
         f.append(average)
         f.append(minimum)
         f.append(maximum)
@@ -233,18 +235,18 @@ def calculateFeatures(message,tokens,pos,slangDictionary,lexicons,mpqa_lexicons,
     #Other Features
 
     #check if message has negation
-    x = hasNegation(tokens,negationList)
+    x = hasNegation(process_tokens,negationList)
     f.append(x)
 
     #check if message has negation preceding words from lexicon
-    x = hasNegationPrecedingLexicon(mpqa_lexicons[2],tokens,negationList)
+    x = hasNegationPrecedingLexicon(mpqa_lexicons[2],process_tokens,negationList)
     f.append(x)
 
-    x = hasNegationPrecedingLexicon(mpqa_lexicons[6],tokens,negationList)
+    x = hasNegationPrecedingLexicon(mpqa_lexicons[6],process_tokens,negationList)
     f.append(x)
     
     #Word Clusters
-    tags = checkClusters(tokens,clusters)
+    tags = checkClusters(process_tokens,clusters)
     f+=tags
 
 

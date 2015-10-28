@@ -1,8 +1,19 @@
+import preProcess
+from lexicons import Slang
+import enchant
+
 #read .tsv file and return labels and messages as lists
 def opentsv(filepath):
 
     labels=[]
     messages=[]
+    process_messages=[]
+    
+    #load Slang Dictionary
+    slangDictionary = Slang.Slang()
+    #load general purpose dictionary
+    dictionary = enchant.Dict("en_US")
+    
     data = open(filepath,'r')
 
     for line in data.readlines():
@@ -10,22 +21,33 @@ def opentsv(filepath):
         l = len(line.split("\t"))
         if l==4:
             labels.append(line.split("\t")[2])
-            messages.append(line.split("\t")[3])
+            message=line.split("\t")[3]
+            
+            processMessage=preProcess.processMessage(message,slangDictionary,dictionary)
+            messages.append(message)
+            process_messages.append(processMessage)
         elif l==3:
             labels.append(line.split("\t")[1])
-            messages.append(line.split("\t")[2])
+            message=line.split("\t")[3]
+            messages.append(message)
+            processMessage=preProcess.processMessage(message,slangDictionary,dictionary)
+            process_messages.append(processMessage)
             
 
     data.close()
 
-    return labels,messages
+    return labels,messages,process_messages
 
 #read .tsv file ignoring neutral messages
 def opentsvPolarity(filepath):
+
     labels=[]
     messages=[]
-
+    process_messages=[]
     
+    #load Slang Dictionary
+    slangDictionary = Slang.Slang()
+    dictionary = enchant.Dict("en_US")
     data = open(filepath,'r')
   
     for line in data :
@@ -34,8 +56,11 @@ def opentsvPolarity(filepath):
         category = line.split("\t")[2]
         if(category != 'neutral') :
             labels.append(category)
-            messages.append(line.split("\t")[3])
+            message=line.split("\t")[3]
+            processMessage=preProcess.processMessage(message,slangDictionary,dictionary)
+            messages.append(message)
+            process_messages.append(processMessage)
 
     data.close()
 
-    return labels,messages
+    return labels,messages,process_messages

@@ -13,7 +13,7 @@ class SentiWordNetLexicon():
     #compute score of message
     def score(self,tokens,pos_tags):
         total = 0.0
-
+    
         for i in range(0,len(pos_tags)) :
             #find word sentiment score
             total += self.findSentiment(tokens[i],pos_tags[i])

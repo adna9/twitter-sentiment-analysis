@@ -34,4 +34,6 @@ class Slang():
         return self.d.has_key(word)
 
             
-        
+               
+    def replaceSlang(self,slang):
+        return self.d[slang]   
