@@ -14,6 +14,8 @@ import time
 from utilities import *
 from feature_selection import selection
 import regularization
+import enchant
+from preProcess import *
 
 #def main():
 
@@ -21,18 +23,21 @@ start_time = time.time()
 
 #load training set
 #dataset_train = "datasets/tweets#2013.tsv"
-#dataset_train = "datasets/training-set-sample.tsv"
-dataset_train = "datasets/train15.tsv"
-labels_train, messages_train,process_messages_train = tsvreader.opentsvPolarity(dataset_train)
+dataset_train = "datasets/training-set-sample.tsv"
+#dataset_train = "datasets/train15.tsv"
+labels_train, messages_train = tsvreader.opentsvPolarity(dataset_train)
 
 #load testing set
-dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
-#dataset_test = "datasets/testing-set-sample.tsv"
-labels_test, messages_test,process_messages_test = tsvreader.opentsvPolarity(dataset_test)
+dataset_test = "datasets/testing-set-sample.tsv"
+labels_test, messages_test = tsvreader.opentsvPolarity(dataset_test)
 
 #load Slang Dictionary
 slangDictionary = Slang.Slang()
+
+#load general purpose dictionary
+dictionary = enchant.Dict("en_US")
 
 # 0 - negative messages
 # 1 - positives messages
@@ -43,11 +48,23 @@ labels_test = [0 if x=="negative" else 1 for x in labels_test]
 tokens_train = tokenize(messages_train)
 tokens_test = tokenize(messages_test)
 
-#tokenize process messages
+#compute pos tags for all messages (after preprocessing the messages pos tags will be recomputed)
+pos_tags_train = arktagger.pos_tag_list(messages_train)
+pos_tags_test = arktagger.pos_tag_list(messages_test)
+
+p1 = time.time()
+#preprocess messages
+process_messages_train = preprocessMessages(messages_train,tokens_train,pos_tags_train,slangDictionary,dictionary)
+process_messages_test = preprocessMessages(messages_test,tokens_test,pos_tags_test,slangDictionary,dictionary)
+p2 = time.time()
+
+print "preprocessing time : " + str(p2-p1) + "\n"
+
+#tokenize process messages (final pos tags)
 process_tokens_train=tokenize(process_messages_train)
 process_tokens_test=tokenize(process_messages_test)
 
-#compute pos tags for all messages
+#compute pos tags for all preprocessed messages
 pos_tags_train = arktagger.pos_tag_list(process_messages_train)
 pos_tags_test = arktagger.pos_tag_list(process_messages_test)
 
@@ -63,7 +80,7 @@ unique_bigrams = getBigramsSet(pos_bigrams_train)
 pos_bigrams_scores_negative = posBigramsScore(unique_bigrams,0,pos_bigrams_train,labels_train)
 pos_bigrams_scores_positive = posBigramsScore(unique_bigrams,1,pos_bigrams_train,labels_train)
 
-#Load Lexicons -> afisa mono osa exei kai o Mixalis
+#Load Lexicons
 
 #Minqing Hu Lexicon
 minqinghu = MinqingHuLexicon.MinqingHuLexicon()
@@ -78,7 +95,7 @@ swn = SentiWordNetLexicon.SentiWordNetLexicon(False)
 #SentiWordNet Lexicon - AverageScores
 swn_avg= SentiWordNetLexicon.SentiWordNetLexicon(True)
 
-lexicons = [minqinghu,afinn,nrc2,nrc5,nrc6]
+lexicons = [minqinghu,afinn,nrc2,nrc5,nrc6,swn,swn_avg]
 
 #MPQA Lexicons (8 Lexicons)
 S_pos = MPQALexicon.MPQALexicon(0)

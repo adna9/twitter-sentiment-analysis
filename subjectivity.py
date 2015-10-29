@@ -14,6 +14,8 @@ from utilities import *
 import learningCurves
 import time
 import regularization
+import enchant
+from preProcess import *
 
 #def classify(train,test):
 
@@ -23,16 +25,19 @@ start_time = time.time()
 dataset_train = "datasets/training-set-sample.tsv"
 #dataset_train = "datasets/train15.tsv"
 #dataset_train = train
-labels_train, messages_train,process_messages_train = tsvreader.opentsv(dataset_train)
+labels_train, messages_train = tsvreader.opentsv(dataset_train)
 
 #load testing set
 #dataset_test = "datasets/dev15.tsv"
 dataset_test = "datasets/testing-set-sample.tsv"
 #dataset_test = test
-labels_test, messages_test,process_messages_test = tsvreader.opentsv(dataset_test)
+labels_test, messages_test = tsvreader.opentsv(dataset_test)
 
 #load Slang Dictionary
 slangDictionary = Slang.Slang()
+
+#load general purpose dictionary
+dictionary = enchant.Dict("en_US")
 
 #merge positive-negative categories into one category(subjective), as we
 #want to check the subjectivity of message
@@ -45,11 +50,23 @@ labels_test = [0 if x=="neutral" else 1 for x in labels_test]
 tokens_train = tokenize(messages_train)
 tokens_test = tokenize(messages_test)
 
-#tokenize process messages
+#compute pos tags for all messages (after preprocessing the messages pos tags will be recomputed)
+pos_tags_train = arktagger.pos_tag_list(messages_train)
+pos_tags_test = arktagger.pos_tag_list(messages_test)
+
+p1 = time.time()
+#preprocess messages
+process_messages_train = preprocessMessages(messages_train,tokens_train,pos_tags_train,slangDictionary,dictionary)
+process_messages_test = preprocessMessages(messages_test,tokens_test,pos_tags_test,slangDictionary,dictionary)
+p2 = time.time()
+
+print "preprocessing time : " + str(p2-p1) + "\n"
+
+#tokenize process messages (final pos tags)
 process_tokens_train=tokenize(process_messages_train)
 process_tokens_test=tokenize(process_messages_test)
 
-#compute pos tags for all messages
+#compute pos tags for all preprocessed messages
 pos_tags_train = arktagger.pos_tag_list(process_messages_train)
 pos_tags_test = arktagger.pos_tag_list(process_messages_test)
 
@@ -96,7 +113,7 @@ W_neu = MPQALexicon.MPQALexicon(7)
 mpqa_lexicons = [S_pos,S_neg,S_pos_neg,S_neu,W_pos,W_neg,W_pos_neg,W_neu]
 
 #assign a precision and F1 score to each word of to all mpqa lexicons
-mpqaScores = getScores(mpqa_lexicons,messages_train,labels_train)
+mpqaScores = getScores(mpqa_lexicons,process_messages_train,labels_train)
 
 #get negations list
 negationList = negations.loadNegations();
@@ -109,6 +126,7 @@ features_train = features_subjectivity.getFeatures(messages_train,process_messag
 
 #regularize train features to [0,1]
 features_train=regularization.regularize(features_train)
+p2 = time.time()
 
 #get features from test messages 
 features_test = features_subjectivity.getFeatures(messages_test,process_messages_test,tokens_test,process_tokens_test,pos_tags_test,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
