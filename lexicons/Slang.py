@@ -20,6 +20,7 @@ class Slang():
         f = open(Slang.directory+Slang.file1,"r")
 
         for line in f.readlines():
+            line = line.decode('utf8')
             slang_word = line.split("\t")[0]
             word = line.split("\t")[1]
             #remove "\n" char 

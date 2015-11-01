@@ -24,6 +24,7 @@ class Clusters():
         f = open(Clusters.directory+Clusters.file1,"r")
         
         for line in f.readlines():
+            line = line.decode('utf8')
             cluster_id = line.split("\t")[0]
             word = line.split("\t")[1]
             

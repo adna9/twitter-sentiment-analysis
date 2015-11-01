@@ -24,6 +24,7 @@ class SocalLexicon():
         f = open(SocalLexicon.directory+filename,"r")
 
         for line in f.readlines():
+            line = line.decode('utf8')
             key = line.split("\t")[0]
             value = line.split("\t")[1]
             self.d[key]=float(value)

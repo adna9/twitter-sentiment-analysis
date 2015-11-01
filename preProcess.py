@@ -5,7 +5,7 @@ def processMessage(messages,tokens,pos,slangDictionary,dictionary,pattern,d,tags
     #the processed message
     process=""
 
-    for i in range(0,len(tokens)):
+    for i in range(0,len(pos)):
         token = tokens[i]
         tag = pos[i]
 

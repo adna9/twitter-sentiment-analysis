@@ -7,7 +7,7 @@ from otherFeatures import *
 from clusterFeatures import *
 
 #return feautures of a list of messages as an array
-def getFeatures(messages,process_messages,tokens,process_tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters):
+def getFeatures(messages,process_messages,tokens,process_tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_trigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,pos_trigrams_scores_negative,pos_trigrams_scores_positive,pos_tags_scores_negative,pos_tags_scores_positive,mpqaScores,negationList,clusters):
     #initialize empty list with features for all message
     features = []
 
@@ -15,7 +15,7 @@ def getFeatures(messages,process_messages,tokens,process_tokens,pos,slangDiction
     for i in range(0,len(messages)):
         
         #list with features for one message
-        f = calculateFeatures(messages[i],process_messages[i],tokens[i],process_tokens[i],pos[i],slangDictionary,lexicons,mpqa_lexicons,pos_bigrams[i],pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters)
+        f = calculateFeatures(messages[i],process_messages[i],tokens[i],process_tokens[i],pos[i],slangDictionary,lexicons,mpqa_lexicons,pos_bigrams[i],pos_trigrams[i],pos_bigrams_scores_negative,pos_bigrams_scores_positive,pos_trigrams_scores_negative,pos_trigrams_scores_positive,pos_tags_scores_negative,pos_tags_scores_positive,mpqaScores,negationList,clusters)
 
         #add f to features
         features.append(f)
@@ -29,7 +29,7 @@ def getFeatures(messages,process_messages,tokens,process_tokens,pos,slangDiction
     return features_array
 
 #calculate features for a message
-def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,mpqaScores,negationList,clusters):
+def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams,pos_trigrams,pos_bigrams_scores_negative,pos_bigrams_scores_positive,pos_trigrams_scores_negative,pos_trigrams_scores_positive,pos_tags_scores_negative,pos_tags_scores_positive,mpqaScores,negationList,clusters):
 
     f=[]
 
@@ -118,33 +118,46 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     #Pos Based Features
 
     #the number of adjectives in the message
-    x = numberOfAdjectives(pos)
-    f.append(x)
+    #x = numberOfAdjectives(pos)
+    #f.append(x)
 
     #the number of adverbs
-    x = numberOfAdverbs(pos)
-    f.append(x)
+    #x = numberOfAdverbs(pos)
+    #f.append(x)
 
     #the number of interjections
-    x = numberOfIntejections(pos)
-    f.append(x)
+    #x = numberOfIntejections(pos)
+    #f.append(x)
 
     #the number of verbs
-    x = numberOfVerbs(pos)
-    f.append(x)
+    #x = numberOfVerbs(pos)
+    #f.append(x)
 
     #the number of nouns
-    x = numberOfNouns(pos)
-    f.append(x)
+    #x = numberOfNouns(pos)
+    #f.append(x)
 
     #the number of proper nouns
-    x = numberOfProperNouns(pos,process_tokens)
-    f.append(x)
+    #x = numberOfProperNouns(pos,process_tokens)
+    #f.append(x)
 
     #the number of urls
     x = numberOfUrls(pos,process_tokens)
     f.append(x)
+    #Pos Tags Features
 
+    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
+    average, maximum, minimum = F1PosTagsScore(pos,pos_tags_scores_negative)
+    f.append(average)
+    f.append(maximum)
+    f.append(minimum)
+
+    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
+    average, maximum, minimum = F1PosTagsScore(pos,pos_tags_scores_positive)
+    f.append(average)
+    f.append(maximum)
+    f.append(minimum)
+    
     #Pos Bigrams Features
     
     #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
@@ -159,7 +172,20 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     f.append(maximum)
     f.append(minimum)
     
+    #Pos Trigrams Features
 
+    #the average,maximun,minium f1 score for the messages pos bigrams for negative messages
+    average, maximum, minimum = F1PosTrigramsScore(pos_trigrams,pos_trigrams_scores_negative)
+    f.append(average)
+    f.append(maximum)
+    f.append(minimum)
+
+    #the average,maximun,minium f1 score for the messages pos bigrams for positive messages
+    average, maximum, minimum = F1PosTrigramsScore(pos_trigrams,pos_trigrams_scores_positive)
+    f.append(average)
+    f.append(maximum)
+    f.append(minimum)
+    
     # Lexicon Based Features
 
     #iterate for every lexicon

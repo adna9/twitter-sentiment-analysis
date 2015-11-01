@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-
-
 def plot_learning_curve(length,features_train,labels_train,features_test,labels_test):
     #run for every 10% of training set and compute training error and testing error
     step = length/10
@@ -25,24 +23,26 @@ def plot_learning_curve(length,features_train,labels_train,features_test,labels_
 
         #get training error
         prediction = LogisticRegression.predict(f,model)
-        train.append(measures.error(l,prediction))
+        train.append(measures.avgF1(l,prediction))
 
         #get testing error
         prediction = LogisticRegression.predict(features_test,model)
-        test.append(measures.error(labels_test,prediction))
+        test.append(measures.avgF1(labels_test,prediction))
 
         #get error for majority classifier
         prediction = MajorityClassifier.predictPol(features_test)
-        maj_clas.append(measures.error(labels_test,prediction))
+        maj_clas.append(measures.avgF1(labels_test,prediction))
 
    
-   
+    karabatsis = [0.6638]*len(train)
+    
     x = np.arange(len(train))*10
-    plt.plot(x,train,color="blue",linewidth="2.0",label="Training Error")
-    plt.plot(x,test,color="blue",linestyle="dashed",linewidth="2.0",label="Testing Error")
-    plt.plot(x,maj_clas,color="red",linewidth="2.0",label="Majority Classifier Error")
+    plt.plot(x,train,color="blue",linewidth="2.0",label="Training F1")
+    plt.plot(x,test,color="blue",linestyle="dashed",linewidth="2.0",label="Testing F1")
+    plt.plot(x,maj_clas,color="red",linewidth="2.0",label="Majority Classifier F1")
+    plt.plot(x,karabatsis,color="green",linewidth="2.0",label="Karabatsis 14")
     plt.ylim(0,1)
-    plt.ylabel('Error')
+    plt.ylabel('F1')
     plt.xlabel("% of messages")
     plt.legend(loc="upper left")
     plt.show()

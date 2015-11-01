@@ -1,4 +1,5 @@
 from nltk import bigrams
+from nltk import trigrams
 from tokenizers import twokenize
 
 def subList(pos_tags,labels,c):
@@ -8,6 +9,15 @@ def subList(pos_tags,labels,c):
             sub.append(pos_tags[i])
 
     return sub
+
+def polaritySubList(subjList,labels):
+    polList=[]
+    for i in range(0,len(subjList)):
+        if labels[i]!="neutral":
+            polList.append(subjList[i])
+            
+    return polList
+
 def tokenize(l):
     tokens=[]
 
@@ -15,7 +25,7 @@ def tokenize(l):
         tokens.append(twokenize.simpleTokenize(item))
 
     return tokens
-
+  
 def getLexiconF1andPrecision(l, messages, labels):
     #initialize dictionaries (exactly the same for positive-negative messages)
     precision_obj = {}
@@ -92,9 +102,29 @@ def getScores(lexicons,messages, labels):
         scores.append(x4)
 
     return scores
+
+def getPosTagsSet(pos_tags):
+    s = set()
+    
+    for x in pos_tags:
+        for pos_tag in x:
+            s.add(pos_tag)
+
+
+    return list(s)
         
     
 def getBigramsSet(pos_bigrams):
+    s = set()
+    
+    for x in pos_bigrams:
+        for bigram in x:
+            s.add(bigram)
+
+
+    return list(s)
+
+def getTrigramsSet(pos_bigrams):
     s = set()
     
     for x in pos_bigrams:
@@ -113,6 +143,31 @@ def getBigrams(l):
 
     return b
 
+#calculate trigrams of every item of the list l
+def getTrigrams(l):
+    tr = []
+    for x in l:
+        tr.append(list(trigrams(x)))
+
+    return tr
+
+
+def posTagsScore(postags,category,pos_tags,labels):
+    
+    #keep pos tagsof specific category
+    pos_tags_category = subList(pos_tags,labels,category)
+
+    #initialize dictionary
+    d = {}
+
+    #calculate score for every bigram
+    for postag in postags:
+        d[postag] = score(postag,category,pos_tags_category,pos_tags)
+
+
+    return d
+
+
 def posBigramsScore(bigrams,category,pos_tags_bigrams,labels):
     #keep pos tags bigrams of specific category
     bigrams_category = subList(pos_tags_bigrams,labels,category)
@@ -127,6 +182,19 @@ def posBigramsScore(bigrams,category,pos_tags_bigrams,labels):
 
     return d
 
+def posTrigramsScore(trigrams,category,pos_tags_trigrams,labels):
+    
+    #keep pos tags bigrams of specific category
+    trigrams_category = subList(pos_tags_trigrams,labels,category)
+
+    #initialize dictionary
+    d = {}
+
+    #calculate score for every bigram
+    for trigram in trigrams:
+        d[trigram] = score(trigram,category,trigrams_category,pos_tags_trigrams)
+
+    return d
 
 def score(bigram,category,bigrams_category,pos_tags_bigrams):
     #messages of "category" containing "bigram"

@@ -119,6 +119,7 @@ class NRCLexicon():
         #self.d_unigrams = {}
 
         for line in f.readlines():
+            line = line.decode('utf8')
             key = line.split("\t")[0]
             value = line.split("\t")[2]
 
@@ -141,6 +142,7 @@ class NRCLexicon():
         f = open(path)
 
         for line in f.readlines():
+            line = line.decode('utf8')
             key = line.split("\t")[0]
             value = line.split("\t")[1]
 
@@ -156,6 +158,7 @@ class NRCLexicon():
         f = open(path)
 
         for line in f.readlines():
+            line = line.decode('utf8')
             key = line.split("\t")[0]
             value = line.split("\t")[1]
 

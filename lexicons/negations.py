@@ -7,6 +7,7 @@ def loadNegations():
     negationsList = []
 
     for line in f.readlines():
+        line = line.decode('utf8')
         negationsList.append(line[0:len(line)-1])
 
 

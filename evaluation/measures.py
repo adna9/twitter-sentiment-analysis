@@ -1,10 +1,7 @@
 def accuracy(label,prediction):
-    #if A[i]==B[i] then A[i]+B[i]==0 or A[i]+B[i]==2
-    #else if A[i]/=B[i] the A[i]+B[i]=1
-    #errors = sum((label+prediction)==1)
     errors=0
     for i in range(0,len(label)) :
-        if(label[i]+prediction[i]==1):
+        if(label[i]!=prediction[i]):
             errors+=1
 
     return (len(label)-errors)/float(len(label))
@@ -12,8 +9,8 @@ def accuracy(label,prediction):
 def error(label,prediction):
     return 1-accuracy(label,prediction)
 
-def avgF1(label,prediction):
-    return (F1(label,prediction,0) + F1(label,prediction,1))/2
+def avgF1(label,prediction,c1,c2):
+    return (F1(label,prediction,c1) + F1(label,prediction,c2))/2
 
 def F1(label,prediction,category):
     pr = precision(label,prediction,category)
@@ -46,7 +43,7 @@ def recall(label,prediction,category):
         if category==label[i] and label[i]==prediction[i]:
             truePositives+=1
 
-    #the number of messages that beling in C
+    #the number of messages that belong in C
     y = len([c for c in label if c==category])
 
     if(y==0) :

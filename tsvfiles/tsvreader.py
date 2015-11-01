@@ -22,7 +22,8 @@ def opentsv(filepath):
         #print i
         #i+=1
         
-        line=unicode(line,"utf-8")
+        #line=unicode(line,"utf-8")
+        line = line.decode('utf8')
         l = len(line.split("\t"))
         if l==4:
             labels.append(line.split("\t")[2])
@@ -57,7 +58,8 @@ def opentsvPolarity(filepath):
     data = open(filepath,'r')
   
     for line in data :
-        line=unicode(line,"utf-8")
+        #line=unicode(line,"utf-8")
+        line = line.decode('utf8')
         #ignore neutral messages
         category = line.split("\t")[2]
         if(category != 'neutral') :
