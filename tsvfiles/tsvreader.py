@@ -16,14 +16,12 @@ def opentsv(filepath):
     
     data = open(filepath,'r')
 
-
-    #i=1
     for line in data.readlines():
-        #print i
-        #i+=1
-        
-        #line=unicode(line,"utf-8")
-        line = line.decode('utf8')
+        try:
+            line = line.decode('utf8')
+        except:
+            line = unicode(line, errors='replace')
+            
         l = len(line.split("\t"))
         if l==4:
             labels.append(line.split("\t")[2])
@@ -34,7 +32,7 @@ def opentsv(filepath):
             #process_messages.append(processMessage)
         elif l==3:
             labels.append(line.split("\t")[1])
-            message=line.split("\t")[3]
+            message=line.split("\t")[2]
             messages.append(message)
             #processMessage=preProcess.processMessage(message,slangDictionary,dictionary)
             #process_messages.append(processMessage)

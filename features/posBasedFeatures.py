@@ -38,3 +38,26 @@ def numberOfUrls(pos,tokens):
 def numberOfSubjectiveEmoticons(pos,tokens):
     return (len([x for x in pos if x=="E"]) + len([x for x in tokens if (x=="EMOTICON_SAD" or x=="EMOTICON_HAPPY")]))
 
+#calculate the number of positive emoticons
+def numberOfPositiveEmoticons(tokens):
+    x = 0
+    
+    emoticons = [':)',':-)',':o)',':]',':3',':c)',':>','=]','8)','=)',':}',':^)','EMOTICON_HAPPY']
+    for token in tokens :
+        if token in emoticons :
+            x+=1
+        
+    return x
+
+#calculate the number of negative emoticons
+def numberOfNegativeEmoticons(tokens):
+    x = 0
+    
+    emoticons = [':(',':-(','>:[',':-c',':c',':-<',':<',':-[',':[',':{','EMOTICON_SAD']
+    
+    for token in tokens :
+        if token in emoticons :
+            x+=1
+            
+    return x
+

@@ -2,39 +2,18 @@ from features import features_subjectivity as features
 from evaluation import measures
 from classifiers import LogisticRegression, SVM, MajorityClassifier
 from utilities import *
-import learningCurves
 import regularization
-from preProcess import *
-from postaggers import arktagger
+
 from evaluation import measures
 
-def classify(messages_train,labels_train,messages_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons,dictionary):
+def classify(messages_train,labels_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons):
+    
 
     #merge positive-negative categories into one category(subjective), as we
     #want to check the subjectivity of message
     # 0 - objective(neutral) messages
     # 1 - subjective(positive or negatve) messages
     labels_train = [0 if x=="neutral" else 1 for x in labels_train]
-
-    #tokenize all messages
-    tokens_train = tokenize(messages_train)
-    tokens_test = tokenize(messages_test)
-
-    #compute pos tags for all messages (after preprocessing the messages pos tags will be recomputed)
-    pos_tags_train = arktagger.pos_tag_list(messages_train)
-    pos_tags_test = arktagger.pos_tag_list(messages_test)
-
-    #preprocess messages
-    process_messages_train = preprocessMessages(messages_train,tokens_train,pos_tags_train,slangDictionary,dictionary)
-    process_messages_test = preprocessMessages(messages_test,tokens_test,pos_tags_test,slangDictionary,dictionary)
-   
-    #tokenize process messages (final pos tags)
-    process_tokens_train=tokenize(process_messages_train)
-    process_tokens_test=tokenize(process_messages_test)
-
-    #compute pos tags for all preprocessed messages
-    pos_tags_train = arktagger.pos_tag_list(process_messages_train)
-    pos_tags_test = arktagger.pos_tag_list(process_messages_test)
 
     #compute pos tag bigrams for all messages
     pos_bigrams_train = getBigrams(pos_tags_train)
@@ -71,7 +50,7 @@ def classify(messages_train,labels_train,messages_test,negationList,clusters,sla
     prediction = LogisticRegression.predict(features_test,model)
     #prediction = SVM.predict(features_test,model)
 
-    return messages_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,prediction
+    return prediction
 
 def evaluate(prediction,labels_test):
 

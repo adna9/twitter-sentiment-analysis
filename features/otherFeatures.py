@@ -21,7 +21,7 @@ def hasNegationPrecedingLexicon(lexicon,tokens,negationList):
     return 0
             
     
-#calculate the number of subjective emoticons
+#calculate the existence of happy emoticons
 def happy_emoticons(tokens):
     
     emoticons = [':)',':-)',':o)',':]',':3',':c)',':>','=]','8)','=)',':}',':^)']
@@ -32,7 +32,7 @@ def happy_emoticons(tokens):
     return 0
 
 
-#calculate the number of subjective emoticons
+#calculate the existence of sad emoticons
 def sad_emoticons(tokens):
     
     emoticons = [':(',':-(','>:[',':-c',':c',':-<',':<',':-[',':[',':{']

@@ -118,45 +118,54 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     #Pos Based Features
 
     #the number of adjectives in the message
-    #x = numberOfAdjectives(pos)
-    #f.append(x)
+    x = numberOfAdjectives(pos)
+    f.append(x)
 
     #the number of adverbs
-    #x = numberOfAdverbs(pos)
-    #f.append(x)
+    x = numberOfAdverbs(pos)
+    f.append(x)
 
     #the number of interjections
-    #x = numberOfIntejections(pos)
-    #f.append(x)
+    x = numberOfIntejections(pos)
+    f.append(x)
 
     #the number of verbs
-    #x = numberOfVerbs(pos)
-    #f.append(x)
+    x = numberOfVerbs(pos)
+    f.append(x)
 
     #the number of nouns
-    #x = numberOfNouns(pos)
-    #f.append(x)
+    x = numberOfNouns(pos)
+    f.append(x)
 
     #the number of proper nouns
-    #x = numberOfProperNouns(pos,process_tokens)
-    #f.append(x)
+    x = numberOfProperNouns(pos,process_tokens)
+    f.append(x)
 
     #the number of urls
     x = numberOfUrls(pos,process_tokens)
     f.append(x)
+
+    #the number of positive emoticons
+    x = numberOfPositiveEmoticons(tokens)
+    f.append(x)
+
+    #the number of negative emoticons
+    x = numberOfNegativeEmoticons(tokens)
+    f.append(x)
+
     #Pos Tags Features
 
-    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
-    average, maximum, minimum = F1PosTagsScore(pos,pos_tags_scores_negative)
-    f.append(average)
-    f.append(maximum)
-    f.append(minimum)
+    #the average,maximun,minium f1 score for the messages pos bigrams for negative messages
+    #average, maximum, minimum = F1PosTagsScore(pos,pos_tags_scores_negative)
+    #f.append(average)
+    #f.append(maximum)
+    #f.append(minimum)
 
-    #the average,maximun,minium f1 score for the messages pos bigrams for objective messages
-    average, maximum, minimum = F1PosTagsScore(pos,pos_tags_scores_positive)
-    f.append(average)
-    f.append(maximum)
-    f.append(minimum)
+    #the average,maximun,minium f1 score for the messages pos bigrams for positive messages
+    #average, maximum, minimum = F1PosTagsScore(pos,pos_tags_scores_positive)
+    #f.append(average)
+    #f.append(maximum)
+    #f.append(minimum)
     
     #Pos Bigrams Features
     
@@ -175,16 +184,16 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     #Pos Trigrams Features
 
     #the average,maximun,minium f1 score for the messages pos bigrams for negative messages
-    average, maximum, minimum = F1PosTrigramsScore(pos_trigrams,pos_trigrams_scores_negative)
-    f.append(average)
-    f.append(maximum)
-    f.append(minimum)
+    #average, maximum, minimum = F1PosTrigramsScore(pos_trigrams,pos_trigrams_scores_negative)
+    #f.append(average)
+    #f.append(maximum)
+    #f.append(minimum)
 
     #the average,maximun,minium f1 score for the messages pos bigrams for positive messages
-    average, maximum, minimum = F1PosTrigramsScore(pos_trigrams,pos_trigrams_scores_positive)
-    f.append(average)
-    f.append(maximum)
-    f.append(minimum)
+    #average, maximum, minimum = F1PosTrigramsScore(pos_trigrams,pos_trigrams_scores_positive)
+    #f.append(average)
+    #f.append(maximum)
+    #f.append(minimum)
     
     # Lexicon Based Features
 
@@ -224,10 +233,6 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
         f.append(x)
 
     #lexicon presicion and F1 scores
-    #lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective
-        
-    #lexicon presicion and F1 scores
-    #lexicon_precision_objective, lexicon_f1_objective, lexicon_precision_subjective, lexicon_f1_subjective
 
     #iterate for every mpqa lexicon
 
@@ -301,12 +306,6 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     #x=numberOfPositionDeterminerNoun(trigrams)
     #f.append(x)
     
-    #x = presense of happy emoticon
-    x=happy_emoticons(tokens)
-    f.append(x)
-    #x = presence of sad_emoticon
-    x=sad_emoticons(tokens)
-    f.append(x)
 
     return f
     

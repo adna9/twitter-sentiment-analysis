@@ -7,17 +7,22 @@ from lexicons import negations,Slang,SocalLexicon,MinqingHuLexicon,afinn,NRCLexi
 from lexicons.afinn import Afinn
 import enchant
 from utilities import polaritySubList
+from preProcess import *
+from postaggers import arktagger
+from utilities import *
 
 t1 = time.time()
 
 #load training set
 #dataset_train = "datasets/training-set-sample.tsv"
 dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/tweets#2013.tsv"
 labels_train,messages_train=tsvreader.opentsv(dataset_train)
 
 #load testing set
 #dataset_test = "datasets/testing-set-sample.tsv"
 dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/devtweets2013.tsv"
 labels_test, messages_test = tsvreader.opentsv(dataset_test)
 
 #get negations list
@@ -31,6 +36,26 @@ slangDictionary = Slang.Slang()
 
 #load general purpose dictionary
 dictionary = enchant.Dict("en_US")
+
+#tokenize all messages
+tokens_train = tokenize(messages_train)
+tokens_test = tokenize(messages_test)
+
+#compute pos tags for all messages (after preprocessing the messages pos tags will be recomputed)
+pos_tags_train = arktagger.pos_tag_list(messages_train)
+pos_tags_test = arktagger.pos_tag_list(messages_test)
+
+#preprocess messages
+process_messages_train = preprocessMessages(messages_train,tokens_train,pos_tags_train,slangDictionary,dictionary)
+process_messages_test = preprocessMessages(messages_test,tokens_test,pos_tags_test,slangDictionary,dictionary)
+
+#tokenize process messages (final pos tags)
+process_tokens_train=tokenize(process_messages_train)
+process_tokens_test=tokenize(process_messages_test)
+
+#compute pos tags for all preprocessed messages
+pos_tags_train = arktagger.pos_tag_list(process_messages_train)
+pos_tags_test = arktagger.pos_tag_list(process_messages_test)
 
 #Load Lexicons
 
@@ -70,10 +95,10 @@ mpqa_lexicons = [S_pos,S_neg,S_pos_neg,S_neu,W_pos,W_neg,W_pos_neg,W_neu,semval_
 
 #STAGE1
 #predict subjectivity
-messages_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,prediction_subj=subjectivity.classify(messages_train,labels_train,messages_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons,dictionary)
+prediction_subj=subjectivity.classify(messages_train,labels_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons)
 #evaluate classification
-print "Subjectivity Detection"
-subjectivity.evaluate(prediction_subj,labels_test)
+#print "Subjectivity Detection"
+#subjectivity.evaluate(prediction_subj,labels_test)
 
 temp1 = []
 temp2 = []
@@ -117,18 +142,22 @@ labels_train = polaritySubList(labels_train,labels_train)
 prediction_pol=polarity.classify(messages_train,labels_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons)
 
 #final prediction
-prediction = prediction_subj
+prediction = []
+#prediction = prediction_subj
+for i in range(0,len(prediction_subj)):
+    prediction.append(prediction_subj[i])
+    
 i = 0
 for j in range(0,len(prediction)):
     if prediction[j]==1:
-            if prediction_pol[i]==0:
-                    prediction[j]=-1
-            else:
-                    prediction[j]=1
-            i+=1
+        if prediction_pol[i]==0:
+            prediction[j]=-1
+        else:
+            prediction[j]=1
+        i+=1
   
 #evaluate classification
-print "Polarity Detection"
+#print "Polarity Detection"
 polarity.evaluate(prediction,labels_test)
 
 t2 = time.time()
