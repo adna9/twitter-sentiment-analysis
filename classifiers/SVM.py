@@ -3,9 +3,14 @@
 from sklearn import svm
 
 #train model
-def train(features,labels):
+def train(features,labels,g=0,c=1,k="rbf",coef0=0,degree=2):
     #define classifier
-    model=svm.SVC(gamma=0.0001,C=100)
+    if k=="linear":
+        model = svm.LinearSVC(C=c)
+    elif k=="poly":
+        model=svm.SVC(C=c,kernel=k,degree=degree,coef0=coef0)
+    else:
+        model=svm.SVC(C=c,kernel=k,gamma=g)
 
     #fit data
     model.fit(features,labels)
