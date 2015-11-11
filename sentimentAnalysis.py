@@ -14,14 +14,14 @@ from utilities import *
 t1 = time.time()
 
 #load training set
-dataset_train = "datasets/training-set-sample.tsv"
-#dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/training-set-sample.tsv"
+dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
 labels_train,messages_train=tsvreader.opentsv(dataset_train)
 
 #load testing set
-dataset_test = "datasets/testing-set-sample.tsv"
-#dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/testing-set-sample.tsv"
+dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
 labels_test, messages_test = tsvreader.opentsv(dataset_test)
 

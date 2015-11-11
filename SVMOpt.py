@@ -22,7 +22,7 @@ from sklearn import svm
 def custom_optimizer(features_train,labels_train,features_test,labels_test):
     # test classifier for different values
 
-    C = [x/float(10) for x in range(1,1000)]
+    C = [x/float(1000) for x in range(1,1000)]
     scores = []
 
     for c in C:
@@ -47,7 +47,7 @@ def custom_optimizer(features_train,labels_train,features_test,labels_test):
 
 def optunity_optimizer(search,f):    
     #optimal_configuration, info, _ = optunity.maximize_structured(performance,search_space=search,num_evals=5)
-    optimal_configuration, info, _ = optunity.maximize_structured(f,search_space=search,num_evals=5)
+    optimal_configuration, info, _ = optunity.maximize_structured(f,search_space=search,num_evals=50)
 
     solution = dict([(k, v) for k, v in optimal_configuration.items() if v is not None])
     print('Solution\n========')
@@ -55,17 +55,9 @@ def optunity_optimizer(search,f):
               
          
 
-def train_svm(data, labels, kernel, C, gamma, degree, coef0):
-    """A generic SVM training function, with arguments based on the chosen kernel."""
-    if kernel == 'linear':
-        model = svm.LinearSVC(C=C)
-    elif kernel == 'rbf':
-        model = svm.SVC(kernel=kernel, C=C, gamma=gamma)
-    elif kernel == 'poly':
-        model = svm.SVC(kernel=kernel, C=C, degree=degree, coef0=coef0)
-    else:
-        print "unknown kernel"
-
+def train_svm(data, labels,C):
+    #model = svm.LinearSVC(C=C)
+    model = svm.SVC(C=C,kernel="linear")
     model.fit(data, labels)
     return model
 
@@ -74,16 +66,17 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
                 kernel=None, C=None, gamma=None, degree=None, coef0=None):
     
     #train model
-    model = train_svm(x_train, y_train, kernel, C, gamma, degree, coef0)
+    model = train_svm(x_train, y_train, C)
     # predict the test set
     predictions = model.decision_function(x_test)
    
-    return optunity.metrics.roc_auc(y_test, predictions, positive=True)
+    #return optunity.metrics.roc_auc(y_test, predictions, positive=True)
+    return measures.avgF1(y_test,predictions,0,1)
 
 t1 = time.time()
 
 #phase
-subjectivity=False
+subjectivity=True
 
 #dataset_train = "datasets/training-set-sample.tsv"
 dataset_train = "datasets/train15.tsv"
@@ -257,23 +250,15 @@ else:
     #regularize test features to [0,1]
     #features_test=regularization.regularize(features_test)
 
-
-#custom optimizer
-#custom_optimizer(features_train,labels_train,features_test,labels_test)
-
 #optunity
-search = {'kernel': {'linear': {'C': [0, 10]},
-                'rbf': {'gamma': [0, 1], 'C': [0, 10]},
-                'poly': {'degree': [2, 5], 'C': [0, 50], 'coef0': [0, 1]}
-                }
-    }
-
-search2 = {'kernel': {'linear': {'C': [0, 10]},
-                'rbf': {'gamma': [0, 1], 'C': [0, 10]}
+search = {'kernel': {'linear': {'C': [0, 1]}
                 }
            }
 
 #run decoratorn "cross_validated" in preformance method
-decorator = optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
-f = decorator(performance)
-optunity_optimizer(search2,f)
+#decorator = optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
+#f = decorator(performance)
+#optunity_optimizer(search,f)
+
+#custom optimizer
+#custom_optimizer(features_train,labels_train,features_test,labels_test)
