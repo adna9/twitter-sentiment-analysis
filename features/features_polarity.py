@@ -118,40 +118,64 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     #Pos Based Features
 
     #the number of adjectives in the message
-    x = numberOfAdjectives(pos)
-    f.append(x)
+    x1 = numberOfAdjectives(pos)
+    #f.append(x)
 
     #the number of adverbs
-    x = numberOfAdverbs(pos)
-    f.append(x)
+    x2 = numberOfAdverbs(pos)
+    #f.append(x)
 
     #the number of interjections
-    x = numberOfIntejections(pos)
-    f.append(x)
+    x3 = numberOfIntejections(pos)
+    #f.append(x)
 
     #the number of verbs
-    x = numberOfVerbs(pos)
-    f.append(x)
+    x4 = numberOfVerbs(pos)
+    #f.append(x)
 
     #the number of nouns
-    x = numberOfNouns(pos)
-    f.append(x)
+    x5 = numberOfNouns(pos)
+    #f.append(x)
 
     #the number of proper nouns
-    x = numberOfProperNouns(pos,process_tokens)
-    f.append(x)
+    x6 = numberOfProperNouns(pos,process_tokens)
+    #f.append(x)
 
     #the number of urls
-    x = numberOfUrls(pos,process_tokens)
-    f.append(x)
+    x7 = numberOfUrls(pos,process_tokens)
+    #f.append(x)
 
     #the number of positive emoticons
-    x = numberOfPositiveEmoticons(tokens)
-    f.append(x)
+    x8 = numberOfPositiveEmoticons(tokens)
+    #f.append(x)
 
     #the number of negative emoticons
-    x = numberOfNegativeEmoticons(tokens)
-    f.append(x)
+    x9 = numberOfNegativeEmoticons(tokens)
+    #f.append(x)
+
+    #find the sum of "special" tokens
+    s = x1+x2+x3+x4+x5+x6+x7+x8+x9
+
+    #divide scores with s and normialize to [-1,1]
+    f.append(2*(x1/float(s))-1)
+    f.append(2*(x2/float(s))-1)
+    f.append(2*(x3/float(s))-1)
+    f.append(2*(x4/float(s))-1)
+    f.append(2*(x5/float(s))-1)
+    f.append(2*(x6/float(s))-1)
+    f.append(2*(x7/float(s))-1)
+    f.append(2*(x8/float(s))-1)
+    f.append(2*(x9/float(s))-1)
+    
+##    f.append(x1/float(s))
+##    f.append(x2/float(s))
+##    f.append(x3/float(s))
+##    f.append(x4/float(s))
+##    f.append(x5/float(s))
+##    f.append(x6/float(s))
+##    f.append(x7/float(s))
+##    f.append(x8/float(s))
+##    f.append(x9/float(s))
 
     #Pos Tags Features
 

@@ -48,7 +48,7 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
 
     
     #regularize train features to [0,1]
-    features_train=regularization.regularize(features_train)
+    #features_train=regularization.regularize(features_train)
 
 
     #get features from test messages 
@@ -56,7 +56,7 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
 
 
     #regularize test features to [0,1]
-    features_test=regularization.regularize(features_test)
+    #features_test=regularization.regularize(features_test)
 
         
     #train classifier and return trained model

@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-def plot_learning_curve(length,features_train,labels_train,features_test,labels_test):
+def plot_learning_curve(features_train,labels_train,features_test,labels_test):
     #run for every 10% of training set and compute training error and testing error
-    step = length/10
+    step = len(features_train)/10
    
     train = []
     test = []
@@ -23,15 +23,15 @@ def plot_learning_curve(length,features_train,labels_train,features_test,labels_
 
         #get training error
         prediction = LogisticRegression.predict(f,model)
-        train.append(measures.avgF1(l,prediction))
+        train.append(measures.avgF1(l,prediction,0,1))
 
         #get testing error
         prediction = LogisticRegression.predict(features_test,model)
-        test.append(measures.avgF1(labels_test,prediction))
+        test.append(measures.avgF1(labels_test,prediction,0,1))
 
         #get error for majority classifier
         prediction = MajorityClassifier.predictPol(features_test)
-        maj_clas.append(measures.avgF1(labels_test,prediction))
+        maj_clas.append(measures.avgF1(labels_test,prediction,0,1))
 
    
     karabatsis = [0.6638]*len(train)
@@ -97,7 +97,7 @@ def C_comparison(length,features_train,labels_train,features_test,labels_test):
 
         prediction = LogisticRegression.predict(features_test,model)
 
-        scores.append((measures.avgF1(labels_test,prediction)))
+        scores.append((measures.avgF1(labels_test,prediction,0,1)))
                       
     plt.plot(C,scores,color="blue",linewidth="2.0")
     plt.xticks(C)
@@ -116,7 +116,7 @@ def plotFeaturesF1(features_train,labels_train,features_test,labels_test):
             f_test = f_test.reshape(f_test.shape[0],1)
             model = LogisticRegression.train(f_train,labels_train)
             prediction = LogisticRegression.predict(f_test,model)
-            y.append(measures.avgF1(labels_test,prediction))
+            y.append(measures.avgF1(labels_test,prediction,0,1))
     plt.plot(x,y,color="blue",linewidth="2.0")
     plt.ylabel("F1")
     plt.xlabel("# of Feature")

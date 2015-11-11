@@ -18,6 +18,8 @@ import numpy as np
 import optunity
 import optunity.metrics
 from sklearn import svm
+import learningCurves
+import regularization
 
 def custom_optimizer(features_train,labels_train,features_test,labels_test):
     # test classifier for different values
@@ -73,17 +75,15 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
     #return optunity.metrics.roc_auc(y_test, predictions, positive=True)
     return measures.avgF1(y_test,predictions,0,1)
 
-t1 = time.time()
-
 #phase
 subjectivity=True
 
-#dataset_train = "datasets/training-set-sample.tsv"
-dataset_train = "datasets/train15.tsv"
+dataset_train = "datasets/training-set-sample.tsv"
+#dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
 
-#dataset_test = "datasets/testing-set-sample.tsv"
-dataset_test = "datasets/dev15.tsv"
+dataset_test = "datasets/testing-set-sample.tsv"
+#dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
 
 if subjectivity:
@@ -262,3 +262,7 @@ search = {'kernel': {'linear': {'C': [0, 1]}
 
 #custom optimizer
 #custom_optimizer(features_train,labels_train,features_test,labels_test)
+
+
+#plot learning curve
+learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test)
