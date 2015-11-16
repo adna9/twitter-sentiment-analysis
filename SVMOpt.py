@@ -18,34 +18,44 @@ import numpy as np
 import optunity
 import optunity.metrics
 from sklearn import svm
+from sklearn import linear_model
 import learningCurves
 import regularization
+import time
 
-def custom_optimizer(features_train,labels_train,features_test,labels_test):
+def custom_optimizer(features_train,labels_train,features_test,labels_test,C):
     # test classifier for different values
 
-    C = [x/float(1000) for x in range(1,1000)]
+    #C = [x/float(1000) for x in range(1,1000)]
     scores = []
 
     for c in C:
-        print str(C.index(c)*100/float(len(C)))+"%"
+        #print str(C.index(c)*100/float(len(C)))+"%"
+        s=0
 
-        model = SVM.train(features_train,labels_train,g=1,c=c,k="linear")
-        prediction = SVM.predict(features_test,model)
-        score = measures.avgF1(labels_test,prediction,0,1)
-        scores.append(score)
+        #3 evals
+        for x in range(0,3):
+            model = SVM.train(features_train,labels_train,g=1,c=c,k="linear")
+            prediction = SVM.predict(features_test,model)
+            score = measures.avgF1(labels_test,prediction,0,1)
+            s+=score
+            
+        s = s/float(3)
+        scores.append(s)
+        
+        print "c = "+str(c)+" score = "+str(score)
 
     bestScore = max(scores)
     bestC = C[scores.index(bestScore)]
 
     print "best C = "+str(bestC)+" , avgF1 = "+str(bestScore)
 
-    plt.plot(C,scores,color="blue",linewidth="2.0",label="avgF1")
-    plt.ylabel('C')
-    plt.xlabel("average F1")
-    plt.ylim(0,1)
-    plt.legend(loc="best")
-    plt.show()
+##    plt.plot(C,scores,color="blue",linewidth="2.0",label="avgF1")
+##    plt.ylabel('C')
+##    plt.xlabel("average F1")
+##    plt.ylim(0,1)
+##    plt.legend(loc="best")
+##    plt.show()
 
 def optunity_optimizer(search,f):    
     #optimal_configuration, info, _ = optunity.maximize_structured(performance,search_space=search,num_evals=5)
@@ -59,14 +69,16 @@ def optunity_optimizer(search,f):
 
 def train_svm(data, labels,C):
     #model = svm.LinearSVC(C=C)
-    model = svm.SVC(C=C,kernel="linear")
+    #print C
+    model = svm.SVC(C=C,kernel="linear",cache_size=2000)
+    #model = linear_model.SGDClassifier()
     model.fit(data, labels)
     return model
 
 #@optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
 def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators=None, max_features=None,
                 kernel=None, C=None, gamma=None, degree=None, coef0=None):
-    
+
     #train model
     model = train_svm(x_train, y_train, C)
     # predict the test set
@@ -76,14 +88,14 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
     return measures.avgF1(y_test,predictions,0,1)
 
 #phase
-subjectivity=True
+subjectivity=False
 
-dataset_train = "datasets/training-set-sample.tsv"
-#dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/training-set-sample.tsv"
+dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
 
-dataset_test = "datasets/testing-set-sample.tsv"
-#dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/testing-set-sample.tsv"
+dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
 
 if subjectivity:
@@ -193,14 +205,14 @@ if subjectivity:
     #get features from train messages
     features_train = features_subjectivity.getFeatures(messages_train,process_messages_train,tokens_train,process_tokens_train,pos_tags_train,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
 
-    #regularize train features to [0,1]
-    #features_train=regularization.regularize(features_train)
+    #regularize train features
+    features_train=regularization.regularize(features_train)
 
     #get features from test messages 
     features_test = features_subjectivity.getFeatures(messages_test,process_messages_test,tokens_test,process_tokens_test,pos_tags_test,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
 
-    #regularize test features to [0,1]
-    #features_test=regularization.regularize(features_test)
+    #regularize test features
+    features_test=regularization.regularize(features_test)
 else:
     # 0 - negative messages
     # 1 - positives messages
@@ -241,28 +253,49 @@ else:
     #get features from train messages
     features_train = features_polarity.getFeatures(messages_train,process_messages_train,tokens_train,process_tokens_train,pos_tags_train,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_train,pos_trigrams_train,pos_bigrams_scores_negative,pos_bigrams_scores_positive,pos_trigrams_scores_negative,pos_trigrams_scores_positive,pos_tags_scores_negative,pos_tags_scores_positive,mpqaScores,negationList,clusters)
 
-    #regularize train features to [0,1]
-    #features_train=regularization.regularize(features_train)
+    #regularize train features
+    features_train=regularization.regularize(features_train)
 
     #get features from test messages 
     features_test = features_polarity.getFeatures(messages_test,process_messages_test,tokens_test,process_tokens_test,pos_tags_test,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_test,pos_trigrams_test,pos_bigrams_scores_negative,pos_bigrams_scores_positive,pos_trigrams_scores_negative,pos_trigrams_scores_positive,pos_tags_scores_negative,pos_tags_scores_positive,mpqaScores,negationList,clusters)
 
-    #regularize test features to [0,1]
-    #features_test=regularization.regularize(features_test)
+    #regularize test features
+    features_test=regularization.regularize(features_test)
+
+
+
+t1 = time.time()
 
 #optunity
-search = {'kernel': {'linear': {'C': [0, 1]}
-                }
-           }
+##search = {'kernel': {'linear': {'C': [0, 1]}
+##                }
+##           }
 
 #run decoratorn "cross_validated" in preformance method
 #decorator = optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
 #f = decorator(performance)
 #optunity_optimizer(search,f)
 
+#optunity
+##search2 = {'kernel': {'linear': {'C': [1, 10]}
+##                }
+##           }
+##
+###run decoratorn "cross_validated" in preformance method
+##decorator = optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
+##f = decorator(performance)
+##optunity_optimizer(search2,f)
+
+
 #custom optimizer
-#custom_optimizer(features_train,labels_train,features_test,labels_test)
+#C = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+C = [x * 0.01 for x in range(0, 1000)]
+C.remove(0)
+custom_optimizer(features_train,labels_train,features_test,labels_test,C)
 
 
 #plot learning curve
-learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test)
+#learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test)
+
+t2 = time.time()
+print "total time : "+str(t2-t1)

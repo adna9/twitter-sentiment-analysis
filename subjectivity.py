@@ -32,7 +32,7 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
     features_train = features.getFeatures(messages_train,process_messages_train,tokens_train,process_tokens_train,pos_tags_train,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_train,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
 
 
-    #regularize train features to [0,1]
+    #regularize train features
     #features_train=regularization.regularize(features_train)
 
       
@@ -40,7 +40,7 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
     features_test = features.getFeatures(messages_test,process_messages_test,tokens_test,process_tokens_test,pos_tags_test,slangDictionary,lexicons,mpqa_lexicons,pos_bigrams_test,pos_bigrams_scores_objective,pos_bigrams_scores_subjective,mpqaScores,negationList,clusters)
 
     
-    #regularize test features to [0,1]
+    #regularize test features
     #features_test=regularization.regularize(features_test)
 
 

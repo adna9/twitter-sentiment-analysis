@@ -1,5 +1,5 @@
 from sklearn import preprocessing
-import numpy as mp
+import numpy as np
 import math
 
 #xi=xi-meam/3*variance
@@ -12,8 +12,8 @@ def regularize(features):
         feat=features[:,i]
     
         #mean and variance of every column
-        mean=mp.mean(feat)
-        var=mp.var(feat)
+        mean=np.mean(feat)
+        var=np.var(feat)
 
         if(var!=0):
             features[:,i]=(features[:,i]-mean)/float(3*var)
