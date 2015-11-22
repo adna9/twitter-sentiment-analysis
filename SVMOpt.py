@@ -22,6 +22,7 @@ from sklearn import linear_model
 import learningCurves
 import regularization
 import time
+from feature_selection import selection
 
 def custom_optimizer(features_train,labels_train,features_test,labels_test,C):
     # test classifier for different values
@@ -63,16 +64,19 @@ def optunity_optimizer(search,f):
 
     solution = dict([(k, v) for k, v in optimal_configuration.items() if v is not None])
     print('Solution\n========')
-    print("\n".join(map(lambda x: "%s \t %s" % (x[0], str(x[1])), solution.items()))) 
+    print("\n".join(map(lambda x: "%s \t %s" % (x[0], str(x[1])), solution.items())))
+
+    return solution["C"]
               
          
 
 def train_svm(data, labels,C):
     #model = svm.LinearSVC(C=C)
     #print C
-    model = svm.SVC(C=C,kernel="linear",cache_size=2000)
+    #model = svm.SVC(C=C,kernel="linear",cache_size=2000)
     #model = linear_model.SGDClassifier()
-    model.fit(data, labels)
+    #model.fit(data, labels)
+    model = SVM.train(data,labels,c=C,k="linear")
     return model
 
 #@optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
@@ -82,20 +86,22 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
     #train model
     model = train_svm(x_train, y_train, C)
     # predict the test set
-    predictions = model.decision_function(x_test)
+    #predictions = model.decision_function(x_test)
+    predictions = SVM.predict(x_test,model)
    
     #return optunity.metrics.roc_auc(y_test, predictions, positive=True)
     return measures.avgF1(y_test,predictions,0,1)
 
 #phase
-subjectivity=False
+subjectivity = True
+feature_selection = True
 
-#dataset_train = "datasets/training-set-sample.tsv"
-dataset_train = "datasets/train15.tsv"
+dataset_train = "datasets/training-set-sample.tsv"
+#dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
 
-#dataset_test = "datasets/testing-set-sample.tsv"
-dataset_test = "datasets/dev15.tsv"
+dataset_test = "datasets/testing-set-sample.tsv"
+#dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
 
 if subjectivity:
@@ -289,13 +295,45 @@ t1 = time.time()
 
 #custom optimizer
 #C = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-C = [x * 0.01 for x in range(0, 1000)]
-C.remove(0)
-custom_optimizer(features_train,labels_train,features_test,labels_test,C)
+#C = [x * 0.01 for x in range(0, 1000)]
+#C.remove(0)
+#custom_optimizer(features_train,labels_train,features_test,labels_test,C)
 
 
 #plot learning curve
 #learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test)
+
+if feature_selection:
+    search = {'kernel': {'linear': {'C': [0, 1]}
+                }
+           }
+    
+    K = list(np.arange(50,features_train.shape[1],50))
+    if K[len(K)-1]!=features_train.shape[1]:
+        K.append(features_train.shape[1])
+
+    C = []
+    scores = []
+
+    for k in K:
+        #select k best features
+        features_train_new, features_test_new = selection.feature_selection(features_train,labels_train,features_test,k)
+
+        #tune SVM with new training set
+        decorator = optunity.cross_validated(x=features_train_new, y=labels_train, num_folds=10)
+        f = decorator(performance)
+        c = optunity_optimizer(search,f)
+
+        C.append(c)
+
+        #calculate score
+        model = SVM.train(data,labels,c=c,k="linear")
+        predictions = SVM.predict(features_test_new,model)
+        score = measures.avgF1(labels_test,predictions,0,1)
+        scores.append(score)
+
+        print "k="+str(k)+" C="+str(c)+" score="+str(score)
+
 
 t2 = time.time()
 print "total time : "+str(t2-t1)

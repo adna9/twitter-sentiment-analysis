@@ -33,7 +33,7 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
 
 
     #regularize train features
-    #features_train=regularization.regularize(features_train)
+    features_train=regularization.regularize(features_train)
 
       
     #get features from test messages 
@@ -41,12 +41,12 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
 
     
     #regularize test features
-    #features_test=regularization.regularize(features_test)
+    features_test=regularization.regularize(features_test)
 
 
     #train classifier and return trained model
     #model = LogisticRegression.train(features_train,labels_train)
-    model = SVM.train(features_train,labels_train,g=0,c=0.1,k="linear",coef0=0,degree=2)    
+    model = SVM.train(features_train,labels_train,g=0,c=13.78125,k="linear")    
     #model = SVM.train(features_train,labels_train,g=0,c=8.3642578125,k="linear",coef0=0,degree=2)
     #model = SVM.train(features_train,labels_train)
 

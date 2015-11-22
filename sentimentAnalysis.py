@@ -14,14 +14,14 @@ from utilities import *
 t1 = time.time()
 
 #load training set
-dataset_train = "datasets/training-set-sample.tsv"
-#dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/training-set-sample.tsv"
+dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
 labels_train,messages_train=tsvreader.opentsv(dataset_train)
 
 #load testing set
-dataset_test = "datasets/testing-set-sample.tsv"
-#dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/testing-set-sample.tsv"
+dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
 labels_test, messages_test = tsvreader.opentsv(dataset_test)
 
@@ -97,8 +97,9 @@ mpqa_lexicons = [S_pos,S_neg,S_pos_neg,S_neu,W_pos,W_neg,W_pos_neg,W_neu,semval_
 #predict subjectivity
 prediction_subj=subjectivity.classify(messages_train,labels_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons)
 #evaluate classification
-#print "Subjectivity Detection"
-#subjectivity.evaluate(prediction_subj,labels_test)
+print "Subjectivity Detection"
+subjectivity.evaluate(prediction_subj,labels_test)
+print "******************************************************"
 
 temp1 = []
 temp2 = []
@@ -157,7 +158,7 @@ for j in range(0,len(prediction)):
         i+=1
   
 #evaluate classification
-#print "Polarity Detection"
+print "Polarity Detection"
 polarity.evaluate(prediction,labels_test)
 
 t2 = time.time()

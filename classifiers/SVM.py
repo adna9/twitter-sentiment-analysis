@@ -6,7 +6,7 @@ from sklearn import svm
 def train(features,labels,g=0,c=1,k="rbf",coef0=0,degree=2):
     #define classifier
     if k=="linear":
-        model = svm.LinearSVC(C=c)
+        model = svm.LinearSVC(C=c,class_weight="auto")
         #model = svm.SVC(C=c,kernel=k)
     elif k=="poly":
         model=svm.SVC(C=c,kernel=k,degree=degree,coef0=coef0)

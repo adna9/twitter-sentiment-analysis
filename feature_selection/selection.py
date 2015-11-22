@@ -1,13 +1,13 @@
-
-
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 
-def feature_selection(features,labels):
-    print(features.shape)
+def feature_selection(features_train,labels_train,features_test,K):
+    fs = SelectKBest(f_classif,K)
+    fs.fit(features_train,labels_train)
 
-    features_new = SelectKBest(f_classif,50).fit_transform(features,labels)
-
-    print(features_new.shape)
+    features_train_new = fs.transform(features_train)
+    features_test_new = fs.transform(features_test)
+    
+    return features_train_new,features_test_new
 
 
