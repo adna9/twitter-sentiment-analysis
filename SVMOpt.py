@@ -93,15 +93,15 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
     return measures.avgF1(y_test,predictions,0,1)
 
 #phase
-subjectivity = True
+subjectivity = False
 feature_selection = True
 
-dataset_train = "datasets/training-set-sample.tsv"
-#dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/training-set-sample.tsv"
+dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
 
-dataset_test = "datasets/testing-set-sample.tsv"
-#dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/testing-set-sample.tsv"
+dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
 
 if subjectivity:
@@ -303,37 +303,37 @@ t1 = time.time()
 #plot learning curve
 #learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test)
 
-if feature_selection:
-    search = {'kernel': {'linear': {'C': [0, 1]}
-                }
-           }
-    
-    K = list(np.arange(50,features_train.shape[1],50))
-    if K[len(K)-1]!=features_train.shape[1]:
-        K.append(features_train.shape[1])
-
-    C = []
-    scores = []
-
-    for k in K:
-        #select k best features
-        features_train_new, features_test_new = selection.feature_selection(features_train,labels_train,features_test,k)
-
-        #tune SVM with new training set
-        decorator = optunity.cross_validated(x=features_train_new, y=labels_train, num_folds=10)
-        f = decorator(performance)
-        c = optunity_optimizer(search,f)
-
-        C.append(c)
-
-        #calculate score
-        model = SVM.train(data,labels,c=c,k="linear")
-        predictions = SVM.predict(features_test_new,model)
-        score = measures.avgF1(labels_test,predictions,0,1)
-        scores.append(score)
-
-        print "k="+str(k)+" C="+str(c)+" score="+str(score)
-
+##if feature_selection:
+##    search = {'kernel': {'linear': {'C': [0, 1]}
+##                }
+##           }
+##    
+##    K = list(np.arange(50,features_train.shape[1],50))
+##    if K[len(K)-1]!=features_train.shape[1]:
+##        K.append(features_train.shape[1])
+##
+##    C = []
+##    scores = []
+##
+##    for k in K:
+##        #select k best features
+##        features_train_new, features_test_new = selection.feature_selection(features_train,labels_train,features_test,k)
+##
+##        #tune SVM with new training set
+##        decorator = optunity.cross_validated(x=features_train_new, y=labels_train, num_folds=10)
+##        f = decorator(performance)
+##        c = optunity_optimizer(search,f)
+##
+##        C.append(c)
+##
+##        #calculate score
+##        model = SVM.train(features_train_new,labels_train,c=c,k="linear")
+##        predictions = SVM.predict(features_test_new,model)
+##        score = measures.avgF1(labels_test,predictions,0,1)
+##        scores.append(score)
+##
+##        print "k="+str(k)+" C="+str(c)+" score="+str(score)
+##
 
 t2 = time.time()
 print "total time : "+str(t2-t1)
