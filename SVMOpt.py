@@ -93,7 +93,7 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
     return measures.avgF1(y_test,predictions,0,1)
 
 #phase
-subjectivity = False
+subjectivity = True
 feature_selection = True
 
 #dataset_train = "datasets/training-set-sample.tsv"
@@ -273,14 +273,14 @@ else:
 t1 = time.time()
 
 #optunity
-##search = {'kernel': {'linear': {'C': [0, 1]}
+##search = {'kernel': {'linear': {'C': [0, 32]}
 ##                }
 ##           }
 
 #run decoratorn "cross_validated" in preformance method
-#decorator = optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
-#f = decorator(performance)
-#optunity_optimizer(search,f)
+##decorator = optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
+##f = decorator(performance)
+##optunity_optimizer(search,f)
 
 #optunity
 ##search2 = {'kernel': {'linear': {'C': [1, 10]}
@@ -334,6 +334,7 @@ t1 = time.time()
 ##
 ##        print "k="+str(k)+" C="+str(c)+" score="+str(score)
 ##
+
 
 t2 = time.time()
 print "total time : "+str(t2-t1)

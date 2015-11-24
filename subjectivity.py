@@ -3,7 +3,7 @@ from evaluation import measures
 from classifiers import LogisticRegression, SVM, MajorityClassifier
 from utilities import *
 import regularization
-
+from feature_selection import selection
 from evaluation import measures
 
 def classify(messages_train,labels_train,messages_test,process_messages_train,process_messages_test,tokens_train,tokens_test,process_tokens_train,process_tokens_test,pos_tags_train,pos_tags_test,negationList,clusters,slangDictionary,lexicons,mpqa_lexicons):
@@ -43,12 +43,18 @@ def classify(messages_train,labels_train,messages_test,process_messages_train,pr
     #regularize test features
     features_test=regularization.regularize(features_test)
 
+    #feature selection
+    #features_train, features_test = selection.feature_selection(features_train,labels_train,features_test,900)
+
+    #C parameter of SVM
+
+    C = 2
+    #C = 0.652890226192
+    #C = 0.001953125
 
     #train classifier and return trained model
     #model = LogisticRegression.train(features_train,labels_train)
-    model = SVM.train(features_train,labels_train,g=0,c=13.78125,k="linear")    
-    #model = SVM.train(features_train,labels_train,g=0,c=8.3642578125,k="linear",coef0=0,degree=2)
-    #model = SVM.train(features_train,labels_train)
+    model = SVM.train(features_train,labels_train,c=C,k="linear")
 
     #predict labels
     #prediction = LogisticRegression.predict(features_test,model)

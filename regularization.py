@@ -2,7 +2,7 @@ from sklearn import preprocessing
 import numpy as np
 import math
 
-#xi=xi-meam/3*variance
+#reguralize features to [-1,1] , xi=xi-meam/3*variance
 def regularize(features):
 
     #regularize per column
@@ -19,7 +19,9 @@ def regularize(features):
             features[:,i]=(features[:,i]-mean)/float(3*var)
         else :
             features[:,i]=0
-            
+
+    features[features>1]=1
+    features[features<-1]=-1
      
     return features
 

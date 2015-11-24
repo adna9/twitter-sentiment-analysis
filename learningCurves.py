@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-def plot_learning_curve(features_train,labels_train,features_test,labels_test):
+def plot_learning_curve(features_train,labels_train,features_test,labels_test,C=1):
     #run for every 10% of training set and compute training error and testing error
     step = len(features_train)/10
    
@@ -13,38 +13,42 @@ def plot_learning_curve(features_train,labels_train,features_test,labels_test):
     maj_clas = []
    
     for i in range(0,10):
-
+        print i
+        
         #train for (i+1)*10 percent of training set
         f = features_train[0:((i+1)*(step))]
         l=labels_train[0:((i+1)*(step))]
 
         #train classifier for the specific subset of training set
-        model = LogisticRegression.train(f,l)
+        #model = LogisticRegression.train(f,l)
+        model = SVM.train(f,l,c=C,k="linear")
 
         #get training error
-        prediction = LogisticRegression.predict(f,model)
-        train.append(measures.avgF1(l,prediction,0,1))
+        #prediction = LogisticRegression.predict(f,model)
+        prediction = SVM.predict(f,model)
+        train.append(measures.accuracy(l,prediction))
 
         #get testing error
-        prediction = LogisticRegression.predict(features_test,model)
-        test.append(measures.avgF1(labels_test,prediction,0,1))
+        #prediction = LogisticRegression.predict(features_test,model)
+        prediction = SVM.predict(features_test,model)
+        test.append(measures.accuracy(labels_test,prediction))
 
         #get error for majority classifier
         prediction = MajorityClassifier.predictPol(features_test)
-        maj_clas.append(measures.avgF1(labels_test,prediction,0,1))
+        maj_clas.append(measures.accuracy(labels_test,prediction))
 
    
-    karabatsis = [0.6638]*len(train)
+    #karabatsis = [0.6431]*len(train)
     
     x = np.arange(len(train))*10
-    plt.plot(x,train,color="blue",linewidth="2.0",label="Training F1")
-    plt.plot(x,test,color="blue",linestyle="dashed",linewidth="2.0",label="Testing F1")
-    plt.plot(x,maj_clas,color="red",linewidth="2.0",label="Majority Classifier F1")
-    plt.plot(x,karabatsis,color="green",linewidth="2.0",label="Karabatsis 14")
+    plt.plot(x,train,color="blue",linewidth="2.0",label="Training Error")
+    plt.plot(x,test,color="blue",linestyle="dashed",linewidth="2.0",label="Testing Error")
+    plt.plot(x,maj_clas,color="red",linewidth="2.0",label="Majority Classifier Error")
+    #plt.plot(x,karabatsis,color="green",linewidth="2.0",label="Karabatsis 14")
     plt.ylim(0,1)
-    plt.ylabel('F1')
+    plt.ylabel('Error')
     plt.xlabel("% of messages")
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower left")
     plt.show()
 
 
