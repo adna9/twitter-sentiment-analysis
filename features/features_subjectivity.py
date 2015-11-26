@@ -271,9 +271,5 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     tags = checkClusters(process_tokens,clusters)
     f+=tags
 
-
-        
-
-
     return f
     
