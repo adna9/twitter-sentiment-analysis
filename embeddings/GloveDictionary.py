@@ -5,8 +5,7 @@ class Glove() :
     directory = "embeddings/Glove/"
     
     file1= "glove.twitter.27B.25d.txt"
-    #file1 = "test.txt"
-
+    
     #constructor
     def __init__(self):
         #initialize dictionary
