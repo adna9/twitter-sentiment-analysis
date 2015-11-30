@@ -94,15 +94,17 @@ def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators
 
 #phase
 subjectivity = True
-feature_selection = True
+feature_selection = False
 
 #dataset_train = "datasets/training-set-sample.tsv"
-dataset_train = "datasets/train15.tsv"
+#dataset_train = "datasets/train15.tsv"
 #dataset_train = "datasets/tweets#2013.tsv"
+dataset_train = "datasets/full_train.tsv"
 
 #dataset_test = "datasets/testing-set-sample.tsv"
-dataset_test = "datasets/dev15.tsv"
+#dataset_test = "datasets/dev15.tsv"
 #dataset_test = "datasets/devtweets2013.tsv"
+dataset_test = "datasets/full_dev.tsv"
 
 if subjectivity:
     #load training set

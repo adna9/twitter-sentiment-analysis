@@ -9,9 +9,9 @@ class Glove() :
 
     directory = "embeddings/Glove/"
     
-    #file1= "glove.twitter.27B.25d.txt"
+    file1= "glove.twitter.27B.25d.txt"
     #file1 = "glove.twitter.27B.100d.txt"
-    file1 = "glove.twitter.27B.50d.txt"
+    #file1 = "glove.twitter.27B.50d.txt"
    
     
     #constructor
@@ -19,9 +19,9 @@ class Glove() :
         #initialize dictionary
 
         self.embeddings={}
-        #self.size=25
+        self.size=25
         #self.size=100
-        self.size=50
+        #self.size=50
         
         #load embeddings
         self.loadEmbeddings()

@@ -13,8 +13,11 @@ from preProcess import *
 import learningCurves
 
 #load the data
-dataset_train = "datasets/train15.tsv"
-dataset_test = "datasets/dev15.tsv"
+#dataset_train = "datasets/train15.tsv"
+#dataset_test = "datasets/dev15.tsv"
+
+dataset_train = "datasets/full_train.tsv"
+dataset_test = "datasets/full_dev.tsv"
 
 #dataset_train = "datasets/training-set-sample.tsv"
 #dataset_test = "datasets/testing-set-sample.tsv"
@@ -79,11 +82,11 @@ features_test = np.array(features_test)
 
 print("Test Embeddings created ...." )
 
-##model = LogisticRegression.train(features_train,labels_train)
-##prediction = LogisticRegression.predict(features_test,model)
+model = LogisticRegression.train(features_train,labels_train)
+prediction = LogisticRegression.predict(features_test,model)
 
-model = SVM.train(features_train,labels_train,k="linear")
-prediction = SVM.predict(features_test,model)
+##model = SVM.train(features_train,labels_train,k="linear")
+##prediction = SVM.predict(features_test,model)
 
 
 print "Average F1 : " +str(measures.avgF1(labels_test,prediction,0,1))

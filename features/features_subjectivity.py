@@ -268,8 +268,8 @@ def calculateFeatures(message,process_message,tokens,process_tokens,pos,slangDic
     f.append(x)
     
     #Word Clusters
-    tags = checkClusters(process_tokens,clusters)
-    f+=tags
+    #tags = checkClusters(process_tokens,clusters)
+    #f+=tags
 
     return f
     

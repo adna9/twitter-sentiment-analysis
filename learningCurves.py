@@ -20,17 +20,17 @@ def plot_learning_curve(features_train,labels_train,features_test,labels_test,C=
         l=labels_train[0:((i+1)*(step))]
 
         #train classifier for the specific subset of training set
-        #model = LogisticRegression.train(f,l)
-        model = SVM.train(f,l,c=C,k="linear")
+        model = LogisticRegression.train(f,l)
+        #model = SVM.train(f,l,c=C,k="linear")
 
         #get training error
-        #prediction = LogisticRegression.predict(f,model)
-        prediction = SVM.predict(f,model)
+        prediction = LogisticRegression.predict(f,model)
+        #prediction = SVM.predict(f,model)
         train.append(measures.error(l,prediction))
 
         #get testing error
-        #prediction = LogisticRegression.predict(features_test,model)
-        prediction = SVM.predict(features_test,model)
+        prediction = LogisticRegression.predict(features_test,model)
+        #prediction = SVM.predict(features_test,model)
         test.append(measures.error(labels_test,prediction))
 
         #get error for majority classifier
