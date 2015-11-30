@@ -26,16 +26,16 @@ def plot_learning_curve(features_train,labels_train,features_test,labels_test,C=
         #get training error
         #prediction = LogisticRegression.predict(f,model)
         prediction = SVM.predict(f,model)
-        train.append(measures.accuracy(l,prediction))
+        train.append(measures.error(l,prediction))
 
         #get testing error
         #prediction = LogisticRegression.predict(features_test,model)
         prediction = SVM.predict(features_test,model)
-        test.append(measures.accuracy(labels_test,prediction))
+        test.append(measures.error(labels_test,prediction))
 
         #get error for majority classifier
-        prediction = MajorityClassifier.predictPol(features_test)
-        maj_clas.append(measures.accuracy(labels_test,prediction))
+        prediction = MajorityClassifier.predictSubj(features_test)
+        maj_clas.append(measures.error(labels_test,prediction))
 
    
     #karabatsis = [0.6431]*len(train)

@@ -42,18 +42,30 @@ def numberOfSubjectiveEmoticons(pos,tokens):
 def numberOfPositiveEmoticons(tokens):
     x = 0
     
-    emoticons = [':)',':-)',':o)',':]',':3',':c)',':>','=]','8)','=)',':}',':^)','EMOTICON_HAPPY']
+    emoticons = [':)',':-)',':o)',':]',':3',':c)',':>','=]','8)','=)',':}',':^)',';)',':p',':-P',':-p',':P','EMOTICON_HAPPY']
     for token in tokens :
         if token in emoticons :
             x+=1
         
     return x
 
+#calculate the number of neutral emoticons
+def numberOfNeutralEmoticons(tokens):
+    x = 0
+    
+    emoticons = [':-/',':/']
+    for token in tokens :
+        if token in emoticons :
+            x+=1
+        
+    return x
+
+
 #calculate the number of negative emoticons
 def numberOfNegativeEmoticons(tokens):
     x = 0
     
-    emoticons = [':(',':-(','>:[',':-c',':c',':-<',':<',':-[',':[',':{','EMOTICON_SAD']
+    emoticons = [':(',':-(','>:[',':-c',':c',':-<',':<',':-[',':[',':{',':\')','EMOTICON_SAD']
     
     for token in tokens :
         if token in emoticons :
