@@ -25,6 +25,13 @@ def regularize(features):
      
     return features
 
+#reguralize features to [-1,1] horizontally, yi=yi/norm(yi,2)
+def regularizeHorizontally(features):
+    for i in range(0,features.shape[0]):
+	features[i] = features[i]/np.linalg.norm(features[i],ord=2)
+
+    return features
+
 #xi=xi-xmin/xman-xmin
 def regularizeMaxMin(features):
 
@@ -45,4 +52,3 @@ def regularizeMaxMin(features):
             
      
     return features
-

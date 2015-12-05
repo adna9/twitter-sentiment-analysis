@@ -61,13 +61,13 @@ def custom_optimizer(features_train,labels_train,features_test,labels_test,C):
 ##    plt.legend(loc="best")
 ##    plt.show()
 
-def sklearn_optimizer(C,features_train,labels_train):
+def sklearn_optimizer(C,features_train,labels_train,features_test,labels_test):
     # Split the dataset
-    X_train, X_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.5, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.25, random_state=0)
 
     tuned_parameters = [{'C': C}]
 
-    clf = GridSearchCV(svm.LinearSVC(), tuned_parameters, cv=5,scoring='f1')
+    clf = GridSearchCV(svm.LinearSVC(), tuned_parameters, cv=5,scoring=custom_scorer)
     clf.fit(X_train, y_train)
 
     print("Grid scores on development set:")
@@ -85,8 +85,23 @@ def sklearn_optimizer(C,features_train,labels_train):
     print("The scores are computed on the full evaluation set.")
     print(" ")
     y_true, y_pred = y_test, clf.predict(X_test)
-    print(classification_report(y_true, y_pred))
+    #print(classification_report(y_true, y_pred))
+    print(measures.avgF1(np.array(y_true),y_pred,0,1))
     print(" ")
+    print("FINAL:")
+    print(" ")
+    bestC = clf.best_params_["C"]
+    model = SVM.train(features_train,labels_train,c=bestC,k="linear")
+    prediction = SVM.predict(features_test,model)
+    print(measures.avgF1(labels_test,prediction,0,1))
+    print(" ")
+    
+
+#calculates average f1 score
+def custom_scorer(estimator, X, y):
+	prediction = estimator.predict(X)
+	return measures.avgF1(y,prediction,0,1)
+
 
 def optunity_optimizer(search,f):    
     #optimal_configuration, info, _ = optunity.maximize_structured(performance,search_space=search,num_evals=5)
@@ -305,7 +320,7 @@ else:
 t1 = time.time()
 
 C=[1,2,3,4,5]
-sklearn_optimizer(C,features_train,labels_train)
+sklearn_optimizer(C,features_train,labels_train,features_test,labels_test)
 
 #optunity
 ##search = {'kernel': {'linear': {'C': [0, 32]}
