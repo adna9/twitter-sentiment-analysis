@@ -13,21 +13,30 @@ from preProcess import *
 import learningCurves
 
 #load the data
-#dataset_train = "datasets/train15.tsv"
-#dataset_test = "datasets/dev15.tsv"
+dataset_train = "datasets/train15.tsv"
+dataset_test = "datasets/dev15.tsv"
 
-dataset_train = "datasets/full_train.tsv"
-dataset_test = "datasets/full_dev.tsv"
+#dataset_train = "datasets/full_train.tsv"
+#dataset_test = "datasets/full_dev.tsv"
 
 #dataset_train = "datasets/training-set-sample.tsv"
 #dataset_test = "datasets/testing-set-sample.tsv"
 
-labels_train,messages_train=tsvreader.opentsv(dataset_train)
-labels_test, messages_test =tsvreader.opentsv(dataset_test)
+subjectivity=True
 
-##labels_train,messages_train=tsvreader.opentsvPolarity(dataset_train)
-##labels_test, messages_test =tsvreader.opentsvPolarity(dataset_test)
+if subjectivity:
+    labels_train,messages_train=tsvreader.opentsv(dataset_train)
+    labels_test, messages_test =tsvreader.opentsv(dataset_test)
 
+    labels_train = [0 if x=="neutral" else 1 for x in labels_train]
+    labels_test = [0 if x=="neutral" else 1 for x in labels_test]
+else:
+    labels_train,messages_train=tsvreader.opentsvPolarity(dataset_train)
+    labels_test, messages_test =tsvreader.opentsvPolarity(dataset_test)
+
+    labels_train = [0 if x=="negative" else 1 for x in labels_train]
+    labels_test = [0 if x=="negative" else 1 for x in labels_test]
+    
 #tokenize all messages
 tokens_train = tokenize(messages_train)
 tokens_test = tokenize(messages_test)
@@ -38,13 +47,6 @@ glove = GloveDictionary.Glove()
 #dictionary = enchant.Dict("en_US")
 
 #slangDictionary = Slang.Slang()
-
-labels_train = [0 if x=="neutral" else 1 for x in labels_train]
-labels_test = [0 if x=="neutral" else 1 for x in labels_test]
-
-##labels_train = [0 if x=="negative" else 1 for x in labels_train]
-##labels_test = [0 if x=="negative" else 1 for x in labels_test]
-
 
 pos_tags_train = arktagger.pos_tag_list(messages_train)
 pos_tags_test = arktagger.pos_tag_list(messages_test)
@@ -82,16 +84,16 @@ features_test = np.array(features_test)
 
 print("Test Embeddings created ...." )
 
-model = LogisticRegression.train(features_train,labels_train)
-prediction = LogisticRegression.predict(features_test,model)
+#model = LogisticRegression.train(features_train,labels_train)
+#prediction = LogisticRegression.predict(features_test,model)
 
 ##model = SVM.train(features_train,labels_train,k="linear")
 ##prediction = SVM.predict(features_test,model)
 
 
-print "Average F1 : " +str(measures.avgF1(labels_test,prediction,0,1))
-print "Accuracy : " +str(measures.accuracy(labels_test,prediction))
+#print "Average F1 : " +str(measures.avgF1(labels_test,prediction,0,1))
+#print "Accuracy : " +str(measures.accuracy(labels_test,prediction))
 
 
-learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test,C=1)
+#learningCurves.plot_learning_curve(features_train,labels_train,features_test,labels_test,C=1)
 

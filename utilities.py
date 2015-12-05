@@ -1,6 +1,16 @@
 from nltk import bigrams
 from nltk import trigrams
 from tokenizers import twokenize
+from evaluation import measures
+from classifiers import LogisticRegression, SVM, MajorityClassifier
+import numpy as np
+import optunity
+import optunity.metrics
+from sklearn import svm
+from sklearn import linear_model
+from sklearn.cross_validation import train_test_split
+from sklearn.grid_search import GridSearchCV
+from sklearn.metrics import classification_report
 
 def subList(pos_tags,labels,c):
     sub=[]
@@ -225,3 +235,111 @@ def score(bigram,category,bigrams_category,pos_tags_bigrams):
         return 0
     
     return (2*precision*recall)/float(precision + recall)
+
+def custom_optimizer(features_train,labels_train,features_test,labels_test,C):
+    # test classifier for different values
+
+    #C = [x/float(1000) for x in range(1,1000)]
+    scores = []
+
+    for c in C:
+        #print str(C.index(c)*100/float(len(C)))+"%"
+        s=0
+
+        #3 evals
+        for x in range(0,3):
+            model = SVM.train(features_train,labels_train,g=1,c=c,k="linear")
+            prediction = SVM.predict(features_test,model)
+            score = measures.avgF1(labels_test,prediction,0,1)
+            s+=score
+            
+        s = s/float(3)
+        scores.append(s)
+        
+        print "c = "+str(c)+" score = "+str(score)
+
+    bestScore = max(scores)
+    bestC = C[scores.index(bestScore)]
+
+    print "best C = "+str(bestC)+" , avgF1 = "+str(bestScore)
+
+##    plt.plot(C,scores,color="blue",linewidth="2.0",label="avgF1")
+##    plt.ylabel('C')
+##    plt.xlabel("average F1")
+##    plt.ylim(0,1)
+##    plt.legend(loc="best")
+##    plt.show()
+
+def sklearn_optimizer(C,features_train,labels_train,features_test,labels_test):
+    # Split the dataset
+    X_train, X_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.25, random_state=0)
+
+    tuned_parameters = [{'C': C}]
+
+    clf = GridSearchCV(svm.LinearSVC(), tuned_parameters, cv=5,scoring=custom_scorer)
+    clf.fit(X_train, y_train)
+
+    print("Grid scores on development set:")
+    print(" ")
+    for params, mean_score, scores in clf.grid_scores_:
+        print("%0.3f (+/-%0.03f) for %r" % (mean_score, scores.std() * 2, params))
+    print(" ")
+    print("Best parameters set found on development set:")
+    print(" ")
+    print(clf.best_params_)
+    print(" ")
+    print("Detailed classification report:")
+    print(" ")
+    print("The model is trained on the full development set.")
+    print("The scores are computed on the full evaluation set.")
+    print(" ")
+    y_true, y_pred = y_test, clf.predict(X_test)
+    #print(classification_report(y_true, y_pred))
+    print(measures.avgF1(np.array(y_true),y_pred,0,1))
+    print(" ")
+    print("FINAL:")
+    print(" ")
+    bestC = clf.best_params_["C"]
+    model = SVM.train(features_train,labels_train,c=bestC,k="linear")
+    prediction = SVM.predict(features_test,model)
+    print(measures.avgF1(labels_test,prediction,0,1))
+    print(" ")
+    
+
+#calculates average f1 score
+def custom_scorer(estimator, X, y):
+	prediction = estimator.predict(X)
+	return measures.avgF1(y,prediction,0,1)
+
+
+def optunity_optimizer(search,f):    
+    #optimal_configuration, info, _ = optunity.maximize_structured(performance,search_space=search,num_evals=5)
+    optimal_configuration, info, _ = optunity.maximize_structured(f,search_space=search,num_evals=50)
+
+    solution = dict([(k, v) for k, v in optimal_configuration.items() if v is not None])
+    print('Solution\n========')
+    print("\n".join(map(lambda x: "%s \t %s" % (x[0], str(x[1])), solution.items())))
+
+    return solution["C"]
+              
+def train_svm(data, labels,C):
+    #model = svm.LinearSVC(C=C)
+    #print C
+    #model = svm.SVC(C=C,kernel="linear",cache_size=2000)
+    #model = linear_model.SGDClassifier()
+    #model.fit(data, labels)
+    model = SVM.train(data,labels,c=C,k="linear")
+    return model
+
+#@optunity.cross_validated(x=features_train, y=labels_train, num_folds=10)
+def performance(x_train, y_train, x_test, y_test, n_neighbors=None, n_estimators=None, max_features=None,
+                kernel=None, C=None, gamma=None, degree=None, coef0=None):
+
+    #train model
+    model = train_svm(x_train, y_train, C)
+    # predict the test set
+    #predictions = model.decision_function(x_test)
+    predictions = SVM.predict(x_test,model)
+   
+    #return optunity.metrics.roc_auc(y_test, predictions, positive=True)
+    return measures.avgF1(y_test,predictions,0,1)
